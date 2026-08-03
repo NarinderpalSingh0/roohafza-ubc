@@ -143,11 +143,10 @@ function buildEntranceTimeline(
     cta: HTMLAnchorElement;
     scrollIndicator: HTMLDivElement;
   },
-  ctx: gsap.Context,
 ) {
   const { entrance: e } = HERO_ANIM;
 
-  return ctx.createTimeline({
+  return gsap.timeline({
     defaults: { ease: HERO_ANIM.easing.entrance },
   })
     .to(refs.background, {
@@ -195,11 +194,10 @@ function buildScrollTimeline(
     cta: HTMLAnchorElement;
     scrollIndicator: HTMLDivElement;
   },
-  ctx: gsap.Context,
 ) {
   const { scroll: s } = HERO_ANIM;
 
-  const tl = ctx.createTimeline({
+  const tl = gsap.timeline({
     scrollTrigger: {
       trigger: refs.root,
       start: "top top",
@@ -264,10 +262,10 @@ export default function HeroSection() {
     if (reducedMotion) return;
 
     const ctx = gsap.context(() => {
-      const entranceTl = buildEntranceTimeline(refs, ctx);
+      const entranceTl = buildEntranceTimeline(refs);
       animationRegistry.register(root, "hero-entrance", entranceTl);
 
-      const scrollTl = buildScrollTimeline(refs, ctx);
+      const scrollTl = buildScrollTimeline(refs);
       animationRegistry.register(root, "hero-scroll", scrollTl);
     });
 
