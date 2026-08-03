@@ -1,4 +1,8 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
+import { gsap } from "../../lib/gsap";
+import { animationRegistry } from "../../lib/animations/registry";
+import { useReducedMotion } from "../../lib/scroll/useReducedMotion";
+import { HERO_ANIM } from "./heroAnimations";
 
 const HERO_HEADLINE = "Rooh Afza";
 const HERO_SUBTITLE = "A timeless legacy, reimagined for a new generation.";
@@ -101,6 +105,135 @@ const styles = {
   },
 } as const;
 
+function setInitialState(
+  refs: {
+    background: HTMLDivElement;
+    brandMark: HTMLParagraphElement;
+    headline: HTMLHeadingElement;
+    subtitle: HTMLParagraphElement;
+    cta: HTMLAnchorElement;
+    scrollIndicator: HTMLDivElement;
+  },
+  reduced: boolean,
+) {
+  if (reduced) {
+    gsap.set(refs.background, { opacity: 1 });
+    gsap.set(refs.brandMark, { opacity: 1, y: 0 });
+    gsap.set(refs.headline, { opacity: 1, y: 0 });
+    gsap.set(refs.subtitle, { opacity: 1, y: 0 });
+    gsap.set(refs.cta, { opacity: 1, scale: 1 });
+    gsap.set(refs.scrollIndicator, { opacity: 1 });
+    return;
+  }
+
+  gsap.set(refs.background, { opacity: 0 });
+  gsap.set(refs.brandMark, { opacity: 0, y: HERO_ANIM.entrance.brandMark.y });
+  gsap.set(refs.headline, { opacity: 0, y: HERO_ANIM.entrance.headline.y });
+  gsap.set(refs.subtitle, { opacity: 0, y: HERO_ANIM.entrance.subtitle.y });
+  gsap.set(refs.cta, { opacity: 0, scale: HERO_ANIM.entrance.cta.scale });
+  gsap.set(refs.scrollIndicator, { opacity: 0 });
+}
+
+function buildEntranceTimeline(
+  refs: {
+    background: HTMLDivElement;
+    brandMark: HTMLParagraphElement;
+    headline: HTMLHeadingElement;
+    subtitle: HTMLParagraphElement;
+    cta: HTMLAnchorElement;
+    scrollIndicator: HTMLDivElement;
+  },
+  ctx: gsap.Context,
+) {
+  const { entrance: e } = HERO_ANIM;
+
+  return ctx.createTimeline({
+    defaults: { ease: HERO_ANIM.easing.entrance },
+  })
+    .to(refs.background, {
+      opacity: 1,
+      duration: e.background.duration,
+      delay: e.background.delay,
+    })
+    .to(refs.brandMark, {
+      opacity: 1,
+      y: 0,
+      duration: e.brandMark.duration,
+      delay: e.brandMark.delay,
+    }, "<")
+    .to(refs.headline, {
+      opacity: 1,
+      y: 0,
+      duration: e.headline.duration,
+      delay: e.headline.delay,
+    }, "<0.1")
+    .to(refs.subtitle, {
+      opacity: 1,
+      y: 0,
+      duration: e.subtitle.duration,
+      delay: e.subtitle.delay,
+    }, "<0.2")
+    .to(refs.cta, {
+      opacity: 1,
+      scale: 1,
+      duration: e.cta.duration,
+      delay: e.cta.delay,
+    }, "<0.1")
+    .to(refs.scrollIndicator, {
+      opacity: 1,
+      duration: e.scrollIndicator.duration,
+      delay: e.scrollIndicator.delay,
+    }, "<0.3");
+}
+
+function buildScrollTimeline(
+  refs: {
+    root: HTMLDivElement;
+    background: HTMLDivElement;
+    headline: HTMLHeadingElement;
+    subtitle: HTMLParagraphElement;
+    cta: HTMLAnchorElement;
+    scrollIndicator: HTMLDivElement;
+  },
+  ctx: gsap.Context,
+) {
+  const { scroll: s } = HERO_ANIM;
+
+  const tl = ctx.createTimeline({
+    scrollTrigger: {
+      trigger: refs.root,
+      start: "top top",
+      end: "bottom top",
+      scrub: true,
+      pin: true,
+      anticipatePin: 1,
+    },
+  });
+
+  tl.to(refs.background, {
+    y: s.backgroundY,
+    ease: "none",
+  }, 0)
+    .to(refs.headline, {
+      scale: s.headlineScale,
+      ease: "none",
+    }, 0)
+    .to(refs.subtitle, {
+      opacity: s.subtitleOpacity,
+      ease: "none",
+    }, 0)
+    .to(refs.cta, {
+      opacity: s.ctaOpacity,
+      ease: "none",
+    }, 0)
+    .to(refs.scrollIndicator, {
+      opacity: s.scrollIndicatorOpacity,
+      ease: "none",
+    }, 0);
+
+  return tl;
+}
+
 export default function HeroSection() {
   const rootRef = useRef<HTMLDivElement>(null);
   const backgroundRef = useRef<HTMLDivElement>(null);
@@ -109,6 +242,40 @@ export default function HeroSection() {
   const subtitleRef = useRef<HTMLParagraphElement>(null);
   const ctaRef = useRef<HTMLAnchorElement>(null);
   const scrollIndicatorRef = useRef<HTMLDivElement>(null);
+  const reducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    const root = rootRef.current;
+    const background = backgroundRef.current;
+    const brandMark = brandMarkRef.current;
+    const headline = headlineRef.current;
+    const subtitle = subtitleRef.current;
+    const cta = ctaRef.current;
+    const scrollIndicator = scrollIndicatorRef.current;
+
+    if (!root || !background || !brandMark || !headline || !subtitle || !cta || !scrollIndicator) {
+      return;
+    }
+
+    const refs = { root, background, brandMark, headline, subtitle, cta, scrollIndicator };
+
+    setInitialState(refs, reducedMotion);
+
+    if (reducedMotion) return;
+
+    const ctx = gsap.context(() => {
+      const entranceTl = buildEntranceTimeline(refs, ctx);
+      animationRegistry.register(root, "hero-entrance", entranceTl);
+
+      const scrollTl = buildScrollTimeline(refs, ctx);
+      animationRegistry.register(root, "hero-scroll", scrollTl);
+    });
+
+    return () => {
+      animationRegistry.killAll(root);
+      ctx.revert();
+    };
+  }, [reducedMotion]);
 
   const handleCtaClick = () => {
     const heritageSection = document.getElementById("heritage");
