@@ -1,4 +1,8 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
+import { gsap } from "../../lib/gsap";
+import { animationRegistry } from "../../lib/animations/registry";
+import { useReducedMotion } from "../../lib/scroll/useReducedMotion";
+import { HERITAGE_ANIM } from "./heritageAnimations";
 
 const HERITAGE_LABEL = "Our Story";
 const HERITAGE_HEADLINE = "A Century of Tradition";
@@ -91,6 +95,7 @@ const styles = {
     bottom: "0",
     width: "1px",
     backgroundColor: "var(--color-border-subtle)",
+    transformOrigin: "top",
   },
   milestone: {
     display: "flex",
@@ -174,6 +179,122 @@ const styles = {
   },
 } as const;
 
+type HeaderRefs = {
+  label: HTMLParagraphElement;
+  headline: HTMLHeadingElement;
+  intro: HTMLParagraphElement;
+};
+
+type TimelineRefs = {
+  line: HTMLDivElement;
+  milestones: HTMLElement[];
+};
+
+type ValuesRefs = {
+  cards: HTMLElement[];
+};
+
+function setInitialState(
+  header: HeaderRefs,
+  timeline: TimelineRefs,
+  values: ValuesRefs,
+  reduced: boolean,
+) {
+  if (reduced) {
+    gsap.set(header.label, { opacity: 1, y: 0 });
+    gsap.set(header.headline, { opacity: 1, y: 0 });
+    gsap.set(header.intro, { opacity: 1, y: 0 });
+    gsap.set(timeline.line, { scaleY: 1 });
+    gsap.set(timeline.milestones, { opacity: 1, y: 0 });
+    gsap.set(values.cards, { opacity: 1, y: 0 });
+    return;
+  }
+
+  const h = HERITAGE_ANIM.header;
+  const t = HERITAGE_ANIM.timeline.milestone;
+  const v = HERITAGE_ANIM.values.card;
+
+  gsap.set(header.label, { opacity: 0, y: h.label.y });
+  gsap.set(header.headline, { opacity: 0, y: h.headline.y });
+  gsap.set(header.intro, { opacity: 0, y: h.intro.y });
+  gsap.set(timeline.line, { scaleY: 0 });
+  gsap.set(timeline.milestones, { opacity: 0, y: t.y });
+  gsap.set(values.cards, { opacity: 0, y: v.y });
+}
+
+function buildHeaderTimeline(header: HeaderRefs) {
+  const h = HERITAGE_ANIM.header;
+
+  return gsap.timeline({
+    defaults: { ease: HERITAGE_ANIM.easing.reveal },
+  })
+    .to(header.label, {
+      opacity: 1,
+      y: 0,
+      duration: h.label.duration,
+    })
+    .to(header.headline, {
+      opacity: 1,
+      y: 0,
+      duration: h.headline.duration,
+    }, "<0.1")
+    .to(header.intro, {
+      opacity: 1,
+      y: 0,
+      duration: h.intro.duration,
+    }, "<0.15");
+}
+
+function buildTimelineReveal(
+  timeline: TimelineRefs,
+  sectionEl: HTMLDivElement,
+) {
+  const t = HERITAGE_ANIM.timeline;
+
+  return gsap.timeline({
+    scrollTrigger: {
+      trigger: sectionEl,
+      start: HERITAGE_ANIM.scroll.start,
+      end: HERITAGE_ANIM.scroll.end,
+      toggleActions: "play none none reverse",
+    },
+  })
+    .to(timeline.line, {
+      scaleY: 1,
+      duration: t.lineDuration,
+      ease: "none",
+    })
+    .to(timeline.milestones, {
+      opacity: 1,
+      y: 0,
+      duration: t.milestone.duration,
+      stagger: t.milestone.stagger,
+      ease: HERITAGE_ANIM.easing.reveal,
+    }, 0.3);
+}
+
+function buildValuesReveal(
+  values: ValuesRefs,
+  sectionEl: HTMLDivElement,
+) {
+  const v = HERITAGE_ANIM.values.card;
+
+  return gsap.timeline({
+    scrollTrigger: {
+      trigger: sectionEl,
+      start: "bottom 80%",
+      toggleActions: "play none none reverse",
+    },
+  })
+    .to(values.cards, {
+      opacity: 1,
+      y: 0,
+      duration: v.duration,
+      stagger: v.stagger,
+      ease: HERITAGE_ANIM.easing.reveal,
+    });
+}
+
 export default function HeritageSection() {
   const rootRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
@@ -181,7 +302,54 @@ export default function HeritageSection() {
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const introRef = useRef<HTMLParagraphElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
+  const timelineLineRef = useRef<HTMLDivElement>(null);
   const valuesRef = useRef<HTMLDivElement>(null);
+  const reducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    const root = rootRef.current;
+    const label = labelRef.current;
+    const headline = headlineRef.current;
+    const intro = introRef.current;
+    const timelineEl = timelineRef.current;
+    const timelineLine = timelineLineRef.current;
+    const valuesEl = valuesRef.current;
+
+    if (!root || !label || !headline || !intro || !timelineEl || !timelineLine || !valuesEl) {
+      return;
+    }
+
+    const milestoneEls = Array.from(
+      timelineEl.querySelectorAll<HTMLElement>('[role="listitem"]'),
+    );
+    const valueCards = Array.from(
+      valuesEl.children,
+    ) as HTMLElement[];
+
+    const header: HeaderRefs = { label, headline, intro };
+    const timeline: TimelineRefs = { line: timelineLine, milestones: milestoneEls };
+    const values: ValuesRefs = { cards: valueCards };
+
+    setInitialState(header, timeline, values, reducedMotion);
+
+    if (reducedMotion) return;
+
+    const ctx = gsap.context(() => {
+      const headerTl = buildHeaderTimeline(header);
+      animationRegistry.register(root, "heritage-header", headerTl);
+
+      const timelineTl = buildTimelineReveal(timeline, root);
+      animationRegistry.register(root, "heritage-timeline", timelineTl);
+
+      const valuesTl = buildValuesReveal(values, root);
+      animationRegistry.register(root, "heritage-values", valuesTl);
+    });
+
+    return () => {
+      animationRegistry.killAll(root);
+      ctx.revert();
+    };
+  }, [reducedMotion]);
 
   return (
     <div ref={rootRef} style={styles.root}>
@@ -199,7 +367,7 @@ export default function HeritageSection() {
         </header>
 
         <div ref={timelineRef} style={styles.timeline} role="list" aria-label="Brand timeline">
-          <div style={styles.timelineLine} aria-hidden="true" />
+          <div ref={timelineLineRef} style={styles.timelineLine} aria-hidden="true" />
           {MILESTONES.map((milestone) => (
             <article key={milestone.year} style={styles.milestone} role="listitem">
               <div style={styles.milestoneDot} aria-hidden="true">
