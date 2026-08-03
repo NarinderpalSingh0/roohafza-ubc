@@ -1,8 +1,14 @@
+import { AppProviders } from "./providers/AppProviders";
+import { AppLayout } from "./components/layout/AppLayout";
+import { SectionRenderer } from "./components/layout/SectionRenderer";
+
 function App() {
   return (
-    <div className="min-h-screen bg-surface-primary">
-      <h1>Rooh Afza — Phase 1 Foundation</h1>
-    </div>
+    <AppProviders>
+      <AppLayout>
+        <SectionRenderer />
+      </AppLayout>
+    </AppProviders>
   );
 }
 
