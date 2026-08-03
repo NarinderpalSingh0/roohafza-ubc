@@ -1,5 +1,6 @@
 import { type ReactNode, useEffect } from "react";
 import { ErrorBoundary } from "../components/ErrorBoundary";
+import { ScrollProvider } from "../lib/scroll/ScrollProvider";
 import { initGsap } from "../lib/gsap";
 import { initLenis, destroyLenis } from "../lib/lenis";
 
@@ -17,5 +18,9 @@ export function AppProviders({ children }: AppProvidersProps) {
     };
   }, []);
 
-  return <ErrorBoundary>{children}</ErrorBoundary>;
+  return (
+    <ErrorBoundary>
+      <ScrollProvider>{children}</ScrollProvider>
+    </ErrorBoundary>
+  );
 }
