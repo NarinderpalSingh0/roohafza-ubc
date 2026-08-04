@@ -1,4 +1,8 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
+import { gsap } from "../../lib/gsap";
+import { animationRegistry } from "../../lib/animations/registry";
+import { useReducedMotion } from "../../lib/scroll/useReducedMotion";
+import { CHALLENGE_ANIM } from "./challengeAnimations";
 
 const CHALLENGE_LABEL = "The Challenge";
 const CHALLENGE_HEADLINE = "Honouring Heritage in a Changing World";
@@ -112,22 +116,124 @@ const styles = {
   },
 } as const;
 
+type HeaderRefs = {
+  label: HTMLParagraphElement;
+  headline: HTMLHeadingElement;
+  intro: HTMLParagraphElement;
+};
+
+function setInitialState(header: HeaderRefs, cards: HTMLElement[], reduced: boolean) {
+  if (reduced) {
+    gsap.set(header.label, { opacity: 1, y: 0 });
+    gsap.set(header.headline, { opacity: 1, y: 0 });
+    gsap.set(header.intro, { opacity: 1, y: 0 });
+    gsap.set(cards, { opacity: 1, y: 0 });
+    return;
+  }
+
+  const h = CHALLENGE_ANIM.header;
+  const c = CHALLENGE_ANIM.cards;
+
+  gsap.set(header.label, { opacity: 0, y: h.label.y });
+  gsap.set(header.headline, { opacity: 0, y: h.headline.y });
+  gsap.set(header.intro, { opacity: 0, y: h.intro.y });
+  gsap.set(cards, { opacity: 0, y: c.y });
+}
+
+function buildHeaderTimeline(header: HeaderRefs) {
+  const h = CHALLENGE_ANIM.header;
+
+  return gsap.timeline({
+    defaults: { ease: CHALLENGE_ANIM.easing.reveal },
+  })
+    .to(header.label, {
+      opacity: 1,
+      y: 0,
+      duration: h.label.duration,
+    })
+    .to(header.headline, {
+      opacity: 1,
+      y: 0,
+      duration: h.headline.duration,
+    }, "<0.1")
+    .to(header.intro, {
+      opacity: 1,
+      y: 0,
+      duration: h.intro.duration,
+    }, "<0.15");
+}
+
+function buildCardsReveal(cards: HTMLElement[], sectionEl: HTMLDivElement) {
+  const c = CHALLENGE_ANIM.cards;
+
+  return gsap.timeline({
+    scrollTrigger: {
+      trigger: sectionEl,
+      start: CHALLENGE_ANIM.scroll.start,
+      toggleActions: "play none none reverse",
+    },
+  })
+    .to(cards, {
+      opacity: 1,
+      y: 0,
+      duration: c.duration,
+      stagger: c.stagger,
+      ease: CHALLENGE_ANIM.easing.reveal,
+    });
+}
+
 export default function ChallengeSection() {
   const rootRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
+  const labelRef = useRef<HTMLParagraphElement>(null);
+  const headlineRef = useRef<HTMLHeadingElement>(null);
+  const introRef = useRef<HTMLParagraphElement>(null);
   const problemsRef = useRef<HTMLDivElement>(null);
+  const reducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    const root = rootRef.current;
+    const label = labelRef.current;
+    const headline = headlineRef.current;
+    const intro = introRef.current;
+    const problems = problemsRef.current;
+
+    if (!root || !label || !headline || !intro || !problems) {
+      return;
+    }
+
+    const cards = Array.from(problems.children) as HTMLElement[];
+    const header: HeaderRefs = { label, headline, intro };
+
+    setInitialState(header, cards, reducedMotion);
+
+    if (reducedMotion) return;
+
+    const ctx = gsap.context(() => {
+      const headerTl = buildHeaderTimeline(header);
+      animationRegistry.register(root, "challenge-header", headerTl);
+
+      const cardsTl = buildCardsReveal(cards, root);
+      animationRegistry.register(root, "challenge-cards", cardsTl);
+    });
+
+    return () => {
+      animationRegistry.killAll(root);
+      ctx.revert();
+    };
+  }, [reducedMotion]);
 
   return (
     <div ref={rootRef} style={styles.root}>
       <div style={styles.container}>
         <header ref={headerRef} style={styles.header}>
-          <p style={styles.label}>
+          <p ref={labelRef} style={styles.label}>
             {CHALLENGE_LABEL}
           </p>
-          <h2 style={styles.headline}>
+          <h2 ref={headlineRef} style={styles.headline}>
             {CHALLENGE_HEADLINE}
           </h2>
-          <p style={styles.intro}>
+          <p ref={introRef} style={styles.intro}>
             {CHALLENGE_INTRO}
           </p>
         </header>
