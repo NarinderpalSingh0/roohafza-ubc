@@ -1,9 +1,17 @@
-import { useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
+import gsap from "gsap";
+import ScrollTrigger from "gsap/ScrollTrigger";
+import { IDENTITY_ANIMATION } from "./identityAnimations";
+import { useReducedMotion } from "../../lib/scroll/useReducedMotion";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function IdentitySection() {
   const rootRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
+
+  const prefersReducedMotion = useReducedMotion();
 
   const identityCards = [
     {
@@ -22,6 +30,46 @@ export default function IdentitySection() {
         "Honouring history while evolving for new generations through innovation and design.",
     },
   ];
+
+  useLayoutEffect(() => {
+    const root = rootRef.current;
+    if (!root || prefersReducedMotion) return;
+
+    const ctx = gsap.context(() => {
+      const headerElements = headerRef.current?.children;
+      const cards = cardsRef.current?.children;
+
+      if (headerElements) {
+        gsap.from(headerElements, {
+          opacity: 0,
+          y: IDENTITY_ANIMATION.yOffset,
+          duration: IDENTITY_ANIMATION.duration.header,
+          stagger: IDENTITY_ANIMATION.delay.headline,
+          ease: IDENTITY_ANIMATION.ease,
+          scrollTrigger: {
+            trigger: headerRef.current,
+            ...IDENTITY_ANIMATION.scrollTrigger,
+          },
+        });
+      }
+
+      if (cards) {
+        gsap.from(cards, {
+          opacity: 0,
+          y: IDENTITY_ANIMATION.yOffset,
+          duration: IDENTITY_ANIMATION.duration.cards,
+          stagger: IDENTITY_ANIMATION.stagger,
+          ease: IDENTITY_ANIMATION.ease,
+          scrollTrigger: {
+            trigger: cardsRef.current,
+            ...IDENTITY_ANIMATION.scrollTrigger,
+          },
+        });
+      }
+    }, root);
+
+    return () => ctx.revert();
+  }, [prefersReducedMotion]);
 
   return (
     <div ref={rootRef}>
