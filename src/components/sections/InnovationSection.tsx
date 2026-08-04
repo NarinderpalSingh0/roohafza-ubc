@@ -1,9 +1,22 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+import { INNOVATION_ANIM } from "./innovationAnimations";
+import { animationRegistry } from "../../lib/animations/registry";
+import { useReducedMotion } from "../../lib/scroll/useReducedMotion";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function InnovationSection() {
   const rootRef = useRef<HTMLDivElement>(null);
-  const headerRef = useRef<HTMLElement>(null);
+
+  const labelRef = useRef<HTMLParagraphElement>(null);
+  const headlineRef = useRef<HTMLHeadingElement>(null);
+  const introRef = useRef<HTMLParagraphElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
+
+  const reducedMotion = useReducedMotion();
 
   const innovationCards = [
     {
@@ -28,18 +41,84 @@ export default function InnovationSection() {
     },
   ];
 
+  useEffect(() => {
+    const root = rootRef.current;
+
+    if (!root) return;
+
+    if (reducedMotion) {
+      gsap.set(root.querySelectorAll("*"), {
+        opacity: 1,
+        y: 0,
+      });
+      return;
+    }
+
+    const ctx = gsap.context(() => {
+      const timeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: root,
+          start: INNOVATION_ANIM.scroll.start,
+        },
+      });
+
+      timeline
+        .from(labelRef.current, {
+          ...INNOVATION_ANIM.header.label,
+          opacity: 0,
+          ease: INNOVATION_ANIM.easing.reveal,
+        })
+        .from(headlineRef.current, {
+          ...INNOVATION_ANIM.header.headline,
+          opacity: 0,
+          ease: INNOVATION_ANIM.easing.reveal,
+        })
+        .from(introRef.current, {
+          ...INNOVATION_ANIM.header.intro,
+          opacity: 0,
+          ease: INNOVATION_ANIM.easing.reveal,
+        });
+
+      const cards = cardsRef.current?.children;
+
+      if (cards) {
+        gsap.from(cards, {
+          ...INNOVATION_ANIM.cards,
+          opacity: 0,
+          stagger: INNOVATION_ANIM.cards.stagger,
+          ease: INNOVATION_ANIM.easing.reveal,
+          scrollTrigger: {
+            trigger: cardsRef.current,
+            start: INNOVATION_ANIM.scroll.start,
+          },
+        });
+      }
+
+      animationRegistry.register(
+        root,
+        "innovation-header",
+        timeline,
+      );
+    }, root);
+
+    return () => {
+      ctx.revert();
+      animationRegistry.killAll(root);
+    };
+  }, [reducedMotion]);
+
   return (
     <div ref={rootRef}>
-      <header ref={headerRef}>
-        <p>Innovation & Future</p>
+      <header>
+        <p ref={labelRef}>Innovation & Future</p>
 
-        <h2>
+        <h2 ref={headlineRef}>
           Tradition Built For
           <br />
           Tomorrow
         </h2>
 
-        <p>
+        <p ref={introRef}>
           Combining heritage, science, creativity, and technology to redefine
           the future of Rooh Afza.
         </p>
