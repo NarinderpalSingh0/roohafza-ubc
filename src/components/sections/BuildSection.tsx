@@ -1,7 +1,22 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+import { BUILD_ANIM } from "./buildAnimations";
+import { animationRegistry } from "../../lib/animations/registry";
+import { useReducedMotion } from "../../lib/scroll/useReducedMotion";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function BuildSection() {
   const rootRef = useRef<HTMLDivElement>(null);
+
+  const labelRef = useRef<HTMLParagraphElement>(null);
+  const headlineRef = useRef<HTMLHeadingElement>(null);
+  const introRef = useRef<HTMLParagraphElement>(null);
+  const cardsRef = useRef<HTMLDivElement>(null);
+
+  const reducedMotion = useReducedMotion();
 
   const buildCards = [
     {
@@ -26,25 +41,87 @@ export default function BuildSection() {
     },
   ];
 
+  useEffect(() => {
+    const root = rootRef.current;
+
+    if (!root) return;
+
+    if (reducedMotion) {
+      gsap.set(root.querySelectorAll("*"), {
+        opacity: 1,
+        y: 0,
+      });
+      return;
+    }
+
+    const ctx = gsap.context(() => {
+      const timeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: root,
+          start: BUILD_ANIM.scroll.start,
+        },
+      });
+
+      timeline
+        .from(labelRef.current, {
+          ...BUILD_ANIM.header.label,
+          opacity: 0,
+          ease: BUILD_ANIM.easing.reveal,
+        })
+        .from(headlineRef.current, {
+          ...BUILD_ANIM.header.headline,
+          opacity: 0,
+          ease: BUILD_ANIM.easing.reveal,
+        })
+        .from(introRef.current, {
+          ...BUILD_ANIM.header.intro,
+          opacity: 0,
+          ease: BUILD_ANIM.easing.reveal,
+        });
+
+      const cards = cardsRef.current?.children;
+
+      if (cards) {
+        gsap.from(cards, {
+          ...BUILD_ANIM.cards,
+          opacity: 0,
+          stagger: BUILD_ANIM.cards.stagger,
+          ease: BUILD_ANIM.easing.reveal,
+          scrollTrigger: {
+            trigger: cardsRef.current,
+            start: BUILD_ANIM.scroll.start,
+          },
+        });
+      }
+
+      animationRegistry.register(root, "build-main", timeline);
+    }, root);
+
+    return () => {
+      ctx.revert();
+      animationRegistry.killAll(root);
+    };
+  }, [reducedMotion]);
+
   return (
     <div ref={rootRef}>
       <div>
         <header>
-          <p>Build The Future</p>
+          <p ref={labelRef}>Build The Future</p>
 
-          <h2>
+          <h2 ref={headlineRef}>
             From Heritage.
             <br />
             To Tomorrow.
           </h2>
 
-          <p>
+          <p ref={introRef}>
             Building a stronger Rooh Afza through innovation, digital
             experiences, and meaningful consumer relationships.
           </p>
         </header>
 
-        <div>
+        <div ref={cardsRef}>
           {buildCards.map((card) => (
             <article key={card.title}>
               <h3>{card.title}</h3>
