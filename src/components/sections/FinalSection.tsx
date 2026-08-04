@@ -81,43 +81,43 @@ export default function FinalSection() {
   }, [reducedMotion]);
 
   return (
-    <div ref={rootRef}>
-      <div>
-        <header>
-          <p ref={labelRef}>The Next Chapter</p>
+    <div ref={rootRef} className="brand-section brand-section--dark">
+      <div className="section-container">
+        <header className="section-header">
+          <p ref={labelRef} className="section-label">The Next Chapter</p>
 
-          <h2 ref={headlineRef}>
+          <h2 ref={headlineRef} className="section-title section-title--light">
             Rooh Afza.
             <br />
             Ready For Tomorrow.
           </h2>
 
-          <p ref={introRef}>
+          <p ref={introRef} className="section-intro section-intro--light">
             A century of trust transformed into a future-focused brand built
             for new generations across the world.
           </p>
         </header>
 
-        <div ref={cardsRef}>
-          <article>
-            <h3>Heritage</h3>
-            <p>
+        <div ref={cardsRef} className="card-grid card-grid--2">
+          <article className="brand-card brand-card--dark">
+            <h3 className="card-title">Heritage</h3>
+            <p className="card-description">
               Preserving the emotional connection that has made Rooh Afza a
               household name for generations.
             </p>
           </article>
 
-          <article>
-            <h3>Innovation</h3>
-            <p>
+          <article className="brand-card brand-card--dark">
+            <h3 className="card-title">Innovation</h3>
+            <p className="card-description">
               Creating modern experiences through products, technology, and
               digital connections.
             </p>
           </article>
 
-          <article>
-            <h3>Global Future</h3>
-            <p>
+          <article className="brand-card brand-card--dark">
+            <h3 className="card-title">Global Future</h3>
+            <p className="card-description">
               Carrying Indian culture and identity to consumers around the
               world.
             </p>

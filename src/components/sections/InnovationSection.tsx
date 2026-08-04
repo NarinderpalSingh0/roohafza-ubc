@@ -20,21 +20,25 @@ export default function InnovationSection() {
 
   const innovationCards = [
     {
+      number: "01",
       title: "Modern Consumer Experiences",
       description:
         "Creating new ways for consumers to experience Rooh Afza through contemporary formats and digital engagement.",
     },
     {
+      number: "02",
       title: "Product Evolution",
       description:
         "Exploring new possibilities while protecting the original taste, trust, and heritage.",
     },
     {
+      number: "03",
       title: "Technology Integration",
       description:
         "Using technology, data, and innovation to build deeper connections with consumers.",
     },
     {
+      number: "04",
       title: "Future Ready Brand",
       description:
         "Transforming a legacy brand into a global symbol for future generations.",
@@ -108,29 +112,32 @@ export default function InnovationSection() {
   }, [reducedMotion]);
 
   return (
-    <div ref={rootRef}>
-      <header>
-        <p ref={labelRef}>Innovation & Future</p>
+    <div ref={rootRef} className="brand-section brand-section--secondary">
+      <div className="section-container">
+        <header className="section-header">
+          <p ref={labelRef} className="section-label">Innovation & Future</p>
 
-        <h2 ref={headlineRef}>
-          Tradition Built For
-          <br />
-          Tomorrow
-        </h2>
+          <h2 ref={headlineRef} className="section-title">
+            Tradition Built For
+            <br />
+            Tomorrow
+          </h2>
 
-        <p ref={introRef}>
-          Combining heritage, science, creativity, and technology to redefine
-          the future of Rooh Afza.
-        </p>
-      </header>
+          <p ref={introRef} className="section-intro">
+            Combining heritage, science, creativity, and technology to redefine
+            the future of Rooh Afza.
+          </p>
+        </header>
 
-      <div ref={cardsRef}>
-        {innovationCards.map((card) => (
-          <article key={card.title}>
-            <h3>{card.title}</h3>
-            <p>{card.description}</p>
-          </article>
-        ))}
+        <div ref={cardsRef} className="card-grid">
+          {innovationCards.map((card) => (
+            <article key={card.title} className="brand-card brand-card--elevated">
+              <span className="card-number">{card.number}</span>
+              <h3 className="card-title">{card.title}</h3>
+              <p className="card-description">{card.description}</p>
+            </article>
+          ))}
+        </div>
       </div>
     </div>
   );

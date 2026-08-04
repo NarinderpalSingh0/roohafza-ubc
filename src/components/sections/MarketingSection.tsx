@@ -20,18 +20,21 @@ export default function MarketingSection() {
 
   const marketingCards = [
     {
+      number: "01",
       title: "Instagram",
       subtitle: "Brand Universe",
       description:
         "Visual storytelling that blends Rooh Afza's heritage with modern lifestyle, community, and cultural moments.",
     },
     {
+      number: "02",
       title: "YouTube",
       subtitle: "Story & Trust",
       description:
         "Long-form storytelling through brand films, behind-the-scenes content, and deeper emotional connections.",
     },
     {
+      number: "03",
       title: "Email",
       subtitle: "Personal Connection",
       description:
@@ -102,29 +105,30 @@ export default function MarketingSection() {
   }, [reducedMotion]);
 
   return (
-    <div ref={rootRef}>
-      <div>
-        <header>
-          <p ref={labelRef}>Digital Connection</p>
+    <div ref={rootRef} className="brand-section brand-section--primary">
+      <div className="section-container">
+        <header className="section-header">
+          <p ref={labelRef} className="section-label">Digital Connection</p>
 
-          <h2 ref={headlineRef}>
+          <h2 ref={headlineRef} className="section-title">
             Three Channels.
             <br />
             One Stronger Connection.
           </h2>
 
-          <p ref={introRef}>
+          <p ref={introRef} className="section-intro">
             A focused digital ecosystem built around storytelling, community,
             and meaningful relationships with consumers.
           </p>
         </header>
 
-        <div ref={cardsRef}>
+        <div ref={cardsRef} className="card-grid card-grid--2">
           {marketingCards.map((card) => (
-            <article key={card.title}>
-              <h3>{card.title}</h3>
-              <p>{card.subtitle}</p>
-              <p>{card.description}</p>
+            <article key={card.title} className="brand-card brand-card--accent">
+              <span className="card-number">{card.number}</span>
+              <h3 className="card-title">{card.title}</h3>
+              <p className="card-subtitle">{card.subtitle}</p>
+              <p className="card-description">{card.description}</p>
             </article>
           ))}
         </div>

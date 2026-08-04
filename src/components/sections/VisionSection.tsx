@@ -20,16 +20,19 @@ export default function VisionSection() {
 
   const visionPoints = [
     {
+      number: "01",
       title: "Preserve Heritage",
       description:
         "Protecting the emotional connection and cultural identity that made Rooh Afza iconic.",
     },
     {
+      number: "02",
       title: "Create Relevance",
       description:
         "Building experiences that connect with new generations of consumers.",
     },
     {
+      number: "03",
       title: "Lead Tomorrow",
       description:
         "Transforming a century-old brand into a future-ready global identity.",
@@ -99,28 +102,29 @@ export default function VisionSection() {
   }, [reducedMotion]);
 
   return (
-    <div ref={rootRef}>
-      <div>
-        <header>
-          <p ref={labelRef}>Future Vision</p>
+    <div ref={rootRef} className="brand-section brand-section--primary">
+      <div className="section-container">
+        <header className="section-header">
+          <p ref={labelRef} className="section-label">Future Vision</p>
 
-          <h2 ref={headlineRef}>
+          <h2 ref={headlineRef} className="section-title">
             A Legacy That
             <br />
             Continues Forward.
           </h2>
 
-          <p ref={introRef}>
+          <p ref={introRef} className="section-intro">
             Reimagining Rooh Afza as a global cultural brand while keeping its
             timeless emotional connection alive.
           </p>
         </header>
 
-        <div ref={cardsRef}>
+        <div ref={cardsRef} className="card-grid">
           {visionPoints.map((point) => (
-            <article key={point.title}>
-              <h3>{point.title}</h3>
-              <p>{point.description}</p>
+            <article key={point.title} className="brand-card brand-card--elevated">
+              <span className="card-number">{point.number}</span>
+              <h3 className="card-title">{point.title}</h3>
+              <p className="card-description">{point.description}</p>
             </article>
           ))}
         </div>

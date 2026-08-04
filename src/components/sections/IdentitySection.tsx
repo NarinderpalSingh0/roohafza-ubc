@@ -72,31 +72,32 @@ export default function IdentitySection() {
   }, [prefersReducedMotion]);
 
   return (
-    <div ref={rootRef}>
-      <div ref={headerRef}>
-        <p>Our Identity</p>
+    <div ref={rootRef} className="brand-section brand-section--secondary">
+      <div className="section-container">
+        <header ref={headerRef} className="section-header">
+          <p className="section-label">Our Identity</p>
 
-        <h2>
-          Tradition Built
-          <br />
-          for Tomorrow
-        </h2>
+          <h2 className="section-title">
+            Tradition Built
+            <br />
+            for Tomorrow
+          </h2>
 
-        <p>
-          Rooh Afza is not only a product. It is a symbol of heritage,
-          trust, and timeless connection across generations.
-        </p>
-      </div>
+          <p className="section-intro">
+            Rooh Afza is not only a product. It is a symbol of heritage,
+            trust, and timeless connection across generations.
+          </p>
+        </header>
 
-      <div ref={cardsRef}>
-        {identityCards.map((card) => (
-          <article key={card.title}>
-            <h3>{card.title}</h3>
-            <p>{card.description}</p>
-          </article>
-        ))}
+        <div ref={cardsRef} className="card-grid">
+          {identityCards.map((card) => (
+            <article key={card.title} className="brand-card brand-card--elevated">
+              <h3 className="card-title">{card.title}</h3>
+              <p className="card-description">{card.description}</p>
+            </article>
+          ))}
+        </div>
       </div>
     </div>
   );
 }
-

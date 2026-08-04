@@ -20,21 +20,25 @@ export default function BuildSection() {
 
   const buildCards = [
     {
+      number: "01",
       title: "Modern Product Innovation",
       description:
         "Creating new experiences that respect Rooh Afza's heritage while adapting to evolving consumer needs.",
     },
     {
+      number: "02",
       title: "Digital First Ecosystem",
       description:
         "Building stronger relationships through technology, community, and direct consumer connections.",
     },
     {
+      number: "03",
       title: "Global Growth",
       description:
         "Expanding Rooh Afza's cultural identity into new international markets.",
     },
     {
+      number: "04",
       title: "Future Ready Brand",
       description:
         "A transformation strategy designed for the next generation of consumers.",
@@ -104,28 +108,29 @@ export default function BuildSection() {
   }, [reducedMotion]);
 
   return (
-    <div ref={rootRef}>
-      <div>
-        <header>
-          <p ref={labelRef}>Build The Future</p>
+    <div ref={rootRef} className="brand-section brand-section--secondary">
+      <div className="section-container">
+        <header className="section-header">
+          <p ref={labelRef} className="section-label">Build The Future</p>
 
-          <h2 ref={headlineRef}>
+          <h2 ref={headlineRef} className="section-title">
             From Heritage.
             <br />
             To Tomorrow.
           </h2>
 
-          <p ref={introRef}>
+          <p ref={introRef} className="section-intro">
             Building a stronger Rooh Afza through innovation, digital
             experiences, and meaningful consumer relationships.
           </p>
         </header>
 
-        <div ref={cardsRef}>
+        <div ref={cardsRef} className="card-grid">
           {buildCards.map((card) => (
-            <article key={card.title}>
-              <h3>{card.title}</h3>
-              <p>{card.description}</p>
+            <article key={card.title} className="brand-card brand-card--elevated">
+              <span className="card-number">{card.number}</span>
+              <h3 className="card-title">{card.title}</h3>
+              <p className="card-description">{card.description}</p>
             </article>
           ))}
         </div>

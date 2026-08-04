@@ -6,7 +6,6 @@ import { PACKAGING_ANIM } from "./packagingAnimations";
 import { animationRegistry } from "../../lib/animations/registry";
 import { useReducedMotion } from "../../lib/scroll/useReducedMotion";
 
-
 gsap.registerPlugin(ScrollTrigger);
 
 export default function PackagingSection() {
@@ -21,21 +20,25 @@ export default function PackagingSection() {
 
   const packagingCards = [
     {
+      number: "01",
       title: "Heritage Reimagined",
       description:
         "A modern packaging language that respects Rooh Afza's century-old legacy while connecting with new generations.",
     },
     {
+      number: "02",
       title: "Premium Experience",
       description:
         "Thoughtful design, refined materials, and visual storytelling transform every bottle into a memorable experience.",
     },
     {
+      number: "03",
       title: "Sustainable Future",
       description:
         "Packaging designed with responsible materials and future-focused environmental thinking.",
     },
     {
+      number: "04",
       title: "Global Identity",
       description:
         "A distinctive visual system that carries Indian heritage to consumers around the world.",
@@ -105,31 +108,33 @@ export default function PackagingSection() {
   }, [reducedMotion]);
 
   return (
-    <div ref={rootRef}>
-      <header>
-        <p ref={labelRef}>Packaging Evolution</p>
+    <div ref={rootRef} className="brand-section brand-section--primary">
+      <div className="section-container">
+        <header className="section-header">
+          <p ref={labelRef} className="section-label">Packaging Evolution</p>
 
-        <h2 ref={headlineRef}>
-          A Century of
-          <br />
-          Heritage, Redesigned
-        </h2>
+          <h2 ref={headlineRef} className="section-title">
+            A Century of
+            <br />
+            Heritage, Redesigned
+          </h2>
 
-        <p ref={introRef}>
-          Reimagining Rooh Afza packaging for modern consumers while
-          preserving the emotional connection built across generations.
-        </p>
-      </header>
+          <p ref={introRef} className="section-intro">
+            Reimagining Rooh Afza packaging for modern consumers while
+            preserving the emotional connection built across generations.
+          </p>
+        </header>
 
-      <div ref={cardsRef}>
-        {packagingCards.map((card) => (
-          <article key={card.title}>
-            <h3>{card.title}</h3>
-            <p>{card.description}</p>
-          </article>
-        ))}
+        <div ref={cardsRef} className="card-grid">
+          {packagingCards.map((card) => (
+            <article key={card.title} className="brand-card brand-card--elevated">
+              <span className="card-number">{card.number}</span>
+              <h3 className="card-title">{card.title}</h3>
+              <p className="card-description">{card.description}</p>
+            </article>
+          ))}
+        </div>
       </div>
     </div>
   );
 }
-
