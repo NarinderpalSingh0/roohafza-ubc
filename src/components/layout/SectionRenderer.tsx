@@ -7,11 +7,11 @@ function SectionFallback() {
   return (
     <div
       style={{
-        minHeight: "100vh",
+        minHeight: "200px",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "var(--color-bg-primary)",
+        backgroundColor: "transparent",
       }}
     />
   );
