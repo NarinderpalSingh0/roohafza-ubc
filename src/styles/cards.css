@@ -851,27 +851,33 @@
   }
 }
 
-/* Heritage Marquee */
+/* Heritage Marquee — thin ticker strip */
 .marquee {
   overflow: hidden;
   background-color: var(--color-primary);
-  padding: clamp(1rem, 2vw, 1.5rem) 0;
+  padding: 0;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  height: 56px;
 }
 
 .marquee__track {
   display: inline-flex;
+  align-items: center;
+  height: 100%;
   animation: marquee-scroll 30s linear infinite;
 }
 
 .marquee__item {
   font-family: var(--font-body);
-  font-size: clamp(0.8125rem, 1.2vw, 1rem);
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--color-cream);
   flex-shrink: 0;
+  line-height: 1;
 }
 
 .marquee__separator {
