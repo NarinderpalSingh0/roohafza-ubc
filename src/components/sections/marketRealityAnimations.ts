@@ -1,4 +1,4 @@
-export const CHALLENGE_ANIM = {
+export const MARKET_REALITY_ANIM = {
   header: {
     label: { duration: 0.8, y: 15 },
     headline: { duration: 1.0, y: 30 },
@@ -7,12 +7,11 @@ export const CHALLENGE_ANIM = {
   statement: {
     duration: 1.0,
     y: 25,
-    delay: 0.3,
   },
-  cards: {
+  equation: {
     duration: 0.8,
-    y: 25,
-    stagger: 0.2,
+    y: 20,
+    stagger: 0.3,
   },
   scroll: {
     start: "top 75%",

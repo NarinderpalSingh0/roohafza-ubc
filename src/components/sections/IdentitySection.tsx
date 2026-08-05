@@ -1,7 +1,8 @@
 import { useLayoutEffect, useRef } from "react";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
-import { IDENTITY_ANIMATION } from "./identityAnimations";
+import { IDENTITY_ANIM } from "./identityAnimations";
+import { animationRegistry } from "../../lib/animations/registry";
 import { useReducedMotion } from "../../lib/scroll/useReducedMotion";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -9,66 +10,89 @@ gsap.registerPlugin(ScrollTrigger);
 export default function IdentitySection() {
   const rootRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
-  const cardsRef = useRef<HTMLDivElement>(null);
+  const oldSideRef = useRef<HTMLDivElement>(null);
+  const arrowRef = useRef<HTMLDivElement>(null);
+  const newSideRef = useRef<HTMLDivElement>(null);
 
   const prefersReducedMotion = useReducedMotion();
 
-  const identityCards = [
-    {
-      title: "Authentic Heritage",
-      description:
-        "More than a beverage, Rooh Afza represents over a century of Indian tradition, wellness, and cultural connection.",
-    },
-    {
-      title: "Natural Wellness",
-      description:
-        "A unique blend inspired by traditional knowledge, crafted with carefully selected ingredients.",
-    },
-    {
-      title: "Modern Legacy",
-      description:
-        "Honouring history while evolving for new generations through innovation and design.",
-    },
-  ];
+  const oldIdentity = ["Traditional summer drink", "Family household staple", "Local icon"];
+  const newIdentity = ["Cultural lifestyle brand", "Everyday personal ritual", "Global symbol"];
 
   useLayoutEffect(() => {
     const root = rootRef.current;
-    if (!root || prefersReducedMotion) return;
+    const oldSide = oldSideRef.current;
+    const arrow = arrowRef.current;
+    const newSide = newSideRef.current;
+    if (!root || !oldSide || !arrow || !newSide) return;
+
+    const headerElements = headerRef.current?.children;
+
+    if (prefersReducedMotion) {
+      if (headerElements) gsap.set(headerElements, { opacity: 1, y: 0 });
+      gsap.set([oldSide, arrow, newSide], { opacity: 1, y: 0, x: 0 });
+      return;
+    }
+
+    const a = IDENTITY_ANIM;
+
+    if (headerElements) {
+      gsap.set(headerElements, { opacity: 0, y: a.header.y });
+    }
+    gsap.set(oldSide, { opacity: 0, x: -a.side.x });
+    gsap.set(arrow, { opacity: 0, scale: a.arrow.scale });
+    gsap.set(newSide, { opacity: 0, x: a.side.x });
 
     const ctx = gsap.context(() => {
-      const headerElements = headerRef.current?.children;
-      const cards = cardsRef.current?.children;
+      const headerTl = gsap.timeline({
+        defaults: { ease: a.ease },
+      });
 
       if (headerElements) {
-        gsap.from(headerElements, {
-          opacity: 0,
-          y: IDENTITY_ANIMATION.yOffset,
-          duration: IDENTITY_ANIMATION.duration.header,
-          stagger: IDENTITY_ANIMATION.delay.headline,
-          ease: IDENTITY_ANIMATION.ease,
-          scrollTrigger: {
-            trigger: headerRef.current,
-            ...IDENTITY_ANIMATION.scrollTrigger,
-          },
+        headerTl.to(headerElements, {
+          opacity: 1,
+          y: 0,
+          duration: a.header.duration,
+          stagger: a.header.stagger,
         });
       }
 
-      if (cards) {
-        gsap.from(cards, {
-          opacity: 0,
-          y: IDENTITY_ANIMATION.yOffset,
-          duration: IDENTITY_ANIMATION.duration.cards,
-          stagger: IDENTITY_ANIMATION.stagger,
-          ease: IDENTITY_ANIMATION.ease,
-          scrollTrigger: {
-            trigger: cardsRef.current,
-            ...IDENTITY_ANIMATION.scrollTrigger,
-          },
-        });
-      }
+      animationRegistry.register(root, "identity-header", headerTl);
+
+      const transformTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: root,
+          start: a.scrollTrigger.start,
+          toggleActions: "play none none reverse",
+        },
+      });
+
+      transformTl
+        .to(oldSide, {
+          opacity: 1,
+          x: 0,
+          duration: a.side.duration,
+          ease: a.ease,
+        })
+        .to(arrow, {
+          opacity: 1,
+          scale: 1,
+          duration: a.arrow.duration,
+          ease: a.ease,
+        }, "+=0.3")
+        .to(newSide, {
+          opacity: 1,
+          x: 0,
+          duration: a.side.duration,
+          ease: a.ease,
+        }, "+=0.1");
+
+      animationRegistry.register(root, "identity-transform", transformTl);
     }, root);
 
-    return () => ctx.revert();
+    return () => {
+      ctx.revert();
+    };
   }, [prefersReducedMotion]);
 
   return (
@@ -89,13 +113,32 @@ export default function IdentitySection() {
           </p>
         </header>
 
-        <div ref={cardsRef} className="card-grid">
-          {identityCards.map((card) => (
-            <article key={card.title} className="brand-card brand-card--elevated">
-              <h3 className="card-title">{card.title}</h3>
-              <p className="card-description">{card.description}</p>
-            </article>
-          ))}
+        <div className="transformation-grid">
+          <div ref={oldSideRef} className="transformation-side transformation-side--old">
+            <span className="transformation-label">Then</span>
+            <ul className="transformation-keywords">
+              {oldIdentity.map((keyword) => (
+                <li key={keyword} className="transformation-keyword">
+                  {keyword}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div ref={arrowRef} className="transformation-arrow" aria-hidden="true">
+            <span className="transformation-arrow__symbol">&rarr;</span>
+          </div>
+
+          <div ref={newSideRef} className="transformation-side transformation-side--new">
+            <span className="transformation-label">Now</span>
+            <ul className="transformation-keywords">
+              {newIdentity.map((keyword) => (
+                <li key={keyword} className="transformation-keyword">
+                  {keyword}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     </div>

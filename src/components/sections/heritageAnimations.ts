@@ -1,18 +1,18 @@
 export const HERITAGE_ANIM = {
   header: {
-    label: { duration: 0.6, y: 15 },
-    headline: { duration: 0.8, y: 30 },
-    intro: { duration: 0.7, y: 20 },
+    label: { duration: 0.8, y: 15 },
+    headline: { duration: 1.0, y: 30 },
+    intro: { duration: 0.9, y: 20 },
   },
   timeline: {
-    lineDuration: 1.5,
-    milestone: { duration: 0.6, y: 25, stagger: 0.15 },
+    lineDuration: 2.0,
+    milestone: { duration: 0.8, y: 25, stagger: 0.25 },
   },
   values: {
-    card: { duration: 0.5, y: 20, stagger: 0.12 },
+    card: { duration: 0.7, y: 20, stagger: 0.15 },
   },
   scroll: {
-    start: "top 80%",
+    start: "top 70%",
     end: "bottom 20%",
   },
   easing: {

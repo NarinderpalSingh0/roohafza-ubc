@@ -3,103 +3,28 @@ import { gsap } from "../../lib/gsap";
 import { animationRegistry } from "../../lib/animations/registry";
 import { useReducedMotion } from "../../lib/scroll/useReducedMotion";
 import { RESEARCH_ANIM } from "./researchAnimations";
+import ImageAsset from "../ui/ImageAsset";
 
 const RESEARCH_LABEL = "Research & Craft";
 const RESEARCH_HEADLINE = "Where Tradition Meets Science";
-const RESEARCH_INTRO = "Rooh Afza is the product of over a century of refinement — a careful balance between time-honoured herbal knowledge and rigorous modern quality standards. Every ingredient is chosen with purpose, every batch prepared with precision.";
 
-const PILLARS = [
+const STATS = [
   {
-    id: "herbal",
-    title: "Herbal Knowledge",
-    description: "Over a century of traditional expertise informs every recipe — knowledge passed through generations of herbalists and perfected over time.",
-    icon: "01",
+    label: "Gen Z",
+    description: "Authenticity matters most when choosing brands",
   },
   {
-    id: "ingredients",
-    title: "Ingredient Selection",
-    description: "Each of the 30+ herbs, fruits, and flowers is carefully chosen for its unique flavour profile and natural nourishing properties.",
-    icon: "02",
+    label: "Modern Consumers",
+    description: "Seek meaningful brands with real heritage",
   },
   {
-    id: "quality",
-    title: "Quality Standards",
-    description: "From source to bottle, consistent taste and trusted preparation ensure every glass of Rooh Afza meets the highest standards.",
-    icon: "03",
+    label: "Digital Discovery",
+    description: "Shapes purchase decisions across generations",
   },
-  {
-    id: "innovation",
-    title: "Continuous Innovation",
-    description: "Evolving with changing consumer needs while staying true to the original vision — tradition and progress in every sip.",
-    icon: "04",
-  },
-] as const;
+];
 
-type HeaderRefs = {
-  label: HTMLParagraphElement;
-  headline: HTMLHeadingElement;
-  intro: HTMLParagraphElement;
-};
-
-function setInitialState(header: HeaderRefs, cards: HTMLElement[], reduced: boolean) {
-  if (reduced) {
-    gsap.set(header.label, { opacity: 1, y: 0 });
-    gsap.set(header.headline, { opacity: 1, y: 0 });
-    gsap.set(header.intro, { opacity: 1, y: 0 });
-    gsap.set(cards, { opacity: 1, y: 0 });
-    return;
-  }
-
-  const h = RESEARCH_ANIM.header;
-  const c = RESEARCH_ANIM.cards;
-
-  gsap.set(header.label, { opacity: 0, y: h.label.y });
-  gsap.set(header.headline, { opacity: 0, y: h.headline.y });
-  gsap.set(header.intro, { opacity: 0, y: h.intro.y });
-  gsap.set(cards, { opacity: 0, y: c.y });
-}
-
-function buildHeaderTimeline(header: HeaderRefs) {
-  const h = RESEARCH_ANIM.header;
-
-  return gsap.timeline({
-    defaults: { ease: RESEARCH_ANIM.easing.reveal },
-  })
-    .to(header.label, {
-      opacity: 1,
-      y: 0,
-      duration: h.label.duration,
-    })
-    .to(header.headline, {
-      opacity: 1,
-      y: 0,
-      duration: h.headline.duration,
-    }, "<0.1")
-    .to(header.intro, {
-      opacity: 1,
-      y: 0,
-      duration: h.intro.duration,
-    }, "<0.15");
-}
-
-function buildCardsReveal(cards: HTMLElement[], sectionEl: HTMLDivElement) {
-  const c = RESEARCH_ANIM.cards;
-
-  return gsap.timeline({
-    scrollTrigger: {
-      trigger: sectionEl,
-      start: RESEARCH_ANIM.scroll.start,
-      toggleActions: "play none none reverse",
-    },
-  })
-    .to(cards, {
-      opacity: 1,
-      y: 0,
-      duration: c.duration,
-      stagger: c.stagger,
-      ease: RESEARCH_ANIM.easing.reveal,
-    });
-}
+const INSIGHT =
+  "What consumers want: Heritage combined with modern experience.";
 
 export default function ResearchSection() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -108,6 +33,7 @@ export default function ResearchSection() {
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const introRef = useRef<HTMLParagraphElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const ingredientsRef = useRef<HTMLDivElement>(null);
   const reducedMotion = useReducedMotion();
 
   useEffect(() => {
@@ -116,24 +42,71 @@ export default function ResearchSection() {
     const headline = headlineRef.current;
     const intro = introRef.current;
     const content = contentRef.current;
+    const ingredients = ingredientsRef.current;
 
-    if (!root || !label || !headline || !intro || !content) {
+    if (!root || !label || !headline || !intro || !content || !ingredients) {
       return;
     }
 
     const cards = Array.from(content.children) as HTMLElement[];
-    const header: HeaderRefs = { label, headline, intro };
+    const ingredientItems = Array.from(ingredients.children) as HTMLElement[];
 
-    setInitialState(header, cards, reducedMotion);
+    if (reducedMotion) {
+      gsap.set([label, headline, intro, ...ingredientItems, ...cards], {
+        opacity: 1,
+        y: 0,
+      });
+      return;
+    }
 
-    if (reducedMotion) return;
+    const h = RESEARCH_ANIM.header;
+
+    gsap.set(label, { opacity: 0, y: h.label.y });
+    gsap.set(headline, { opacity: 0, y: h.headline.y });
+    gsap.set(intro, { opacity: 0, y: h.intro.y });
+    gsap.set(ingredientItems, { opacity: 0, y: RESEARCH_ANIM.ingredients.y });
+    gsap.set(cards, { opacity: 0, y: RESEARCH_ANIM.cards.y });
 
     const ctx = gsap.context(() => {
-      const headerTl = buildHeaderTimeline(header);
+      const headerTl = gsap.timeline({
+        defaults: { ease: RESEARCH_ANIM.easing.reveal },
+      })
+        .to(label, { opacity: 1, y: 0, duration: h.label.duration })
+        .to(headline, { opacity: 1, y: 0, duration: h.headline.duration }, "<0.1");
+
       animationRegistry.register(root, "research-header", headerTl);
 
-      const cardsTl = buildCardsReveal(cards, root);
-      animationRegistry.register(root, "research-cards", cardsTl);
+      const storyTl = gsap.timeline({
+        scrollTrigger: {
+          trigger: root,
+          start: RESEARCH_ANIM.scroll.start,
+          toggleActions: "play none none reverse",
+        },
+      });
+
+      storyTl
+        .to(ingredientItems, {
+          opacity: 1,
+          y: 0,
+          duration: RESEARCH_ANIM.ingredients.duration,
+          stagger: RESEARCH_ANIM.ingredients.stagger,
+          ease: RESEARCH_ANIM.easing.reveal,
+        })
+        .to(intro, {
+          opacity: 1,
+          y: 0,
+          duration: h.intro.duration,
+          ease: RESEARCH_ANIM.easing.reveal,
+        }, "+=0.2")
+        .to(cards, {
+          opacity: 1,
+          y: 0,
+          duration: RESEARCH_ANIM.cards.duration,
+          stagger: RESEARCH_ANIM.cards.stagger,
+          ease: RESEARCH_ANIM.easing.reveal,
+        }, "+=0.1");
+
+      animationRegistry.register(root, "research-story", storyTl);
     });
 
     return () => {
@@ -152,20 +125,61 @@ export default function ResearchSection() {
           <h2 ref={headlineRef} className="section-title">
             {RESEARCH_HEADLINE}
           </h2>
-          <p ref={introRef} className="section-intro">
-            {RESEARCH_INTRO}
-          </p>
         </header>
 
-        <div ref={contentRef} className="card-grid">
-          {PILLARS.map((pillar) => (
-            <article key={pillar.id} className="brand-card brand-card--elevated">
-              <div className="card-number" aria-hidden="true">
-                {pillar.icon}
-              </div>
-              <h3 className="card-title">{pillar.title}</h3>
-              <p className="card-description">{pillar.description}</p>
-            </article>
+        <div ref={ingredientsRef} className="ingredient-visuals" aria-hidden="true">
+          <div className="ingredient-visual">
+            <ImageAsset
+              src="/assets/images/ingredients/rose-petals.jpg"
+              alt="Rose petals — key Rooh Afza ingredient"
+              aspect="square"
+              animation="fade"
+              animationDelay={0}
+            />
+            <span className="ingredient-visual__label">Rose Petals</span>
+          </div>
+          <div className="ingredient-visual">
+            <ImageAsset
+              src="/assets/images/ingredients/herbs.jpg"
+              alt="Traditional herbs — botanical blend"
+              aspect="square"
+              animation="fade"
+              animationDelay={0.15}
+            />
+            <span className="ingredient-visual__label">Herbs</span>
+          </div>
+          <div className="ingredient-visual">
+            <ImageAsset
+              src="/assets/images/ingredients/fruits.jpg"
+              alt="Fresh fruits — natural sweetness"
+              aspect="square"
+              animation="fade"
+              animationDelay={0.3}
+            />
+            <span className="ingredient-visual__label">Fruits</span>
+          </div>
+          <div className="ingredient-visual">
+            <ImageAsset
+              src="/assets/images/ingredients/spices.jpg"
+              alt="Aromatic spices — heritage formula"
+              aspect="square"
+              animation="fade"
+              animationDelay={0.45}
+            />
+            <span className="ingredient-visual__label">Spices</span>
+          </div>
+        </div>
+
+        <p ref={introRef} className="insight-statement">
+          {INSIGHT}
+        </p>
+
+        <div ref={contentRef} className="stats-row">
+          {STATS.map((stat) => (
+            <div key={stat.label} className="stat-item">
+              <p className="stat-label">{stat.label}</p>
+              <p className="stat-description">{stat.description}</p>
+            </div>
           ))}
         </div>
       </div>

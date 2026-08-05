@@ -18,30 +18,26 @@ export default function InnovationSection() {
 
   const reducedMotion = useReducedMotion();
 
-  const innovationCards = [
+  const evolution = [
     {
-      number: "01",
-      title: "Modern Consumer Experiences",
-      description:
-        "Creating new ways for consumers to experience Rooh Afza through contemporary formats and digital engagement.",
+      stage: "Today",
+      product: "Rooh Afza Syrup",
+      description: "The original. A century of trust in every bottle.",
     },
     {
-      number: "02",
-      title: "Product Evolution",
-      description:
-        "Exploring new possibilities while protecting the original taste, trust, and heritage.",
+      stage: "Next",
+      product: "Ready-to-Drink",
+      description: "Convenient, modern formats for on-the-go consumers.",
     },
     {
-      number: "03",
-      title: "Technology Integration",
-      description:
-        "Using technology, data, and innovation to build deeper connections with consumers.",
+      stage: "Future",
+      product: "Wellness Formats",
+      description: "Health-conscious variants rooted in traditional knowledge.",
     },
     {
-      number: "04",
-      title: "Future Ready Brand",
-      description:
-        "Transforming a legacy brand into a global symbol for future generations.",
+      stage: "Vision",
+      product: "Global Lifestyle Brand",
+      description: "Beyond beverage — a cultural identity carried worldwide.",
     },
   ];
 
@@ -87,9 +83,9 @@ export default function InnovationSection() {
 
       if (cards) {
         gsap.from(cards, {
-          ...INNOVATION_ANIM.cards,
+          ...INNOVATION_ANIM.stages,
           opacity: 0,
-          stagger: INNOVATION_ANIM.cards.stagger,
+          stagger: INNOVATION_ANIM.stages.stagger,
           ease: INNOVATION_ANIM.easing.reveal,
           scrollTrigger: {
             trigger: cardsRef.current,
@@ -118,25 +114,36 @@ export default function InnovationSection() {
           <p ref={labelRef} className="section-label">Innovation & Future</p>
 
           <h2 ref={headlineRef} className="section-title">
-            Tradition Built For
-            <br />
-            Tomorrow
+            Product Evolution
           </h2>
 
           <p ref={introRef} className="section-intro">
-            Combining heritage, science, creativity, and technology to redefine
-            the future of Rooh Afza.
+            From a single iconic product to a portfolio that meets
+            every consumer moment.
           </p>
         </header>
 
-        <div ref={cardsRef} className="card-grid">
-          {innovationCards.map((card) => (
-            <article key={card.title} className="brand-card brand-card--elevated">
-              <span className="card-number">{card.number}</span>
-              <h3 className="card-title">{card.title}</h3>
-              <p className="card-description">{card.description}</p>
-            </article>
+        <div ref={cardsRef} className="evolution-map">
+          {evolution.map((item, index) => (
+            <div key={item.stage} className="evolution-map__stage">
+              <div className="evolution-map__marker">
+                <span className="evolution-map__stage-label">{item.stage}</span>
+                {index < evolution.length - 1 && (
+                  <span className="evolution-map__connector" />
+                )}
+              </div>
+              <div className="evolution-map__content">
+                <h3 className="evolution-map__product">{item.product}</h3>
+                <p className="evolution-map__description">{item.description}</p>
+              </div>
+            </div>
           ))}
+        </div>
+
+        <div className="section-cta">
+          <a href="#marketing" className="cta-button">
+            See The Future <span aria-hidden="true">&rarr;</span>
+          </a>
         </div>
       </div>
     </div>

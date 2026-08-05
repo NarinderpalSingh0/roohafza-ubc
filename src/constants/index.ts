@@ -2,31 +2,41 @@ import type { SectionId } from "../types";
 
 export const SECTION: Record<SectionId, SectionId> = {
   hero: "hero",
+  marquee: "marquee",
   heritage: "heritage",
+  "bridge-1": "bridge-1",
   challenge: "challenge",
   research: "research",
+  "market-reality": "market-reality",
   personas: "personas",
   identity: "identity",
+  "bridge-2": "bridge-2",
   packaging: "packaging",
   innovation: "innovation",
   marketing: "marketing",
   build: "build",
   vision: "vision",
+  "social-proof": "social-proof",
   final: "final",
 } as const;
 
 export const SECTION_ORDER: readonly SectionId[] = [
   "hero",
+  "marquee",
   "heritage",
+  "bridge-1",
   "challenge",
   "research",
+  "market-reality",
   "personas",
   "identity",
+  "bridge-2",
   "packaging",
   "innovation",
   "marketing",
   "build",
   "vision",
+  "social-proof",
   "final",
 ] as const;
 

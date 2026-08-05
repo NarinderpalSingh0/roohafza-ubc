@@ -1,15 +1,20 @@
 export type SectionId =
   | "hero"
+  | "marquee"
   | "heritage"
+  | "bridge-1"
   | "challenge"
   | "research"
+  | "market-reality"
   | "personas"
   | "identity"
+  | "bridge-2"
   | "packaging"
   | "innovation"
   | "marketing"
   | "build"
   | "vision"
+  | "social-proof"
   | "final";
 
 export type FeatureTier = 1 | 2 | 3;

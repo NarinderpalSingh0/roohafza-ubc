@@ -1,11 +1,11 @@
 export const HERO_ANIM = {
   entrance: {
-    background: { duration: 1.2, delay: 0 },
-    brandMark: { duration: 0.8, delay: 0.3, y: 20 },
-    headline: { duration: 1.0, delay: 0.5, y: 40 },
-    subtitle: { duration: 0.8, delay: 0.8, y: 20 },
-    cta: { duration: 0.6, delay: 1.1, scale: 0.9 },
-    scrollIndicator: { duration: 0.6, delay: 1.5 },
+    background: { duration: 1.5, delay: 0 },
+    brandMark: { duration: 1.0, delay: 0.4, y: 20 },
+    headline: { duration: 1.2, delay: 0.6, y: 40 },
+    subtitle: { duration: 1.0, delay: 1.0, y: 20 },
+    cta: { duration: 0.8, delay: 1.4, scale: 0.9 },
+    scrollIndicator: { duration: 0.8, delay: 2.0 },
   },
   scroll: {
     pinDuration: 1,

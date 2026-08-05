@@ -73,3 +73,15 @@
   color: var(--color-text-secondary);
   margin: 0;
 }
+
+/* Challenge statement */
+.challenge-statement {
+  font-family: var(--font-heading);
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--color-text-primary);
+  text-align: center;
+  max-width: 48rem;
+  margin: 0 auto clamp(3rem, 6vw, 4rem);
+}

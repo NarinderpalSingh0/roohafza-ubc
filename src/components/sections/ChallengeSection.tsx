@@ -6,32 +6,30 @@ import { CHALLENGE_ANIM } from "./challengeAnimations";
 
 const CHALLENGE_LABEL = "The Challenge";
 const CHALLENGE_HEADLINE = "Honouring Heritage in a Changing World";
-const CHALLENGE_INTRO = "Rooh Afza has immense cultural trust, but changing consumer behaviour requires the brand to evolve while protecting its authenticity.";
+const CHALLENGE_STATEMENT =
+  "A century-old icon cannot survive on nostalgia alone. It must transform nostalgia into relevance.";
 
-const CHALLENGES = [
+const PROBLEMS = [
   {
-    id: "preferences",
-    title: "Changing Consumer Preferences",
-    description: "Younger consumers seek modern experiences, convenience, and stronger digital connections.",
+    id: "culture",
+    title: "Culture Shift",
+    description:
+      "Younger consumers seek modern experiences, convenience, and stronger digital connections.",
     icon: "01",
   },
   {
     id: "competition",
-    title: "Category Competition",
-    description: "The beverage market is crowded with new-age brands competing for attention.",
+    title: "Competition",
+    description:
+      "The beverage market is crowded with new-age brands competing for attention.",
     icon: "02",
   },
   {
-    id: "heritage",
-    title: "Heritage Perception",
-    description: "A century-old legacy must remain relevant without feeling outdated.",
+    id: "digital",
+    title: "Digital Shift",
+    description:
+      "Purchase decisions increasingly happen online, through social media and peer influence.",
     icon: "03",
-  },
-  {
-    id: "global",
-    title: "Global Expansion",
-    description: "Building stronger international relevance while preserving cultural identity.",
-    icon: "04",
   },
 ] as const;
 
@@ -101,12 +99,32 @@ function buildCardsReveal(cards: HTMLElement[], sectionEl: HTMLDivElement) {
     });
 }
 
+function buildStatementReveal(statement: HTMLElement, sectionEl: HTMLDivElement) {
+  const s = CHALLENGE_ANIM.statement;
+
+  return gsap.timeline({
+    scrollTrigger: {
+      trigger: sectionEl,
+      start: CHALLENGE_ANIM.scroll.start,
+      toggleActions: "play none none reverse",
+    },
+  })
+    .to(statement, {
+      opacity: 1,
+      y: 0,
+      duration: s.duration,
+      delay: s.delay,
+      ease: CHALLENGE_ANIM.easing.reveal,
+    });
+}
+
 export default function ChallengeSection() {
   const rootRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLParagraphElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const introRef = useRef<HTMLParagraphElement>(null);
+  const statementRef = useRef<HTMLParagraphElement>(null);
   const problemsRef = useRef<HTMLDivElement>(null);
   const reducedMotion = useReducedMotion();
 
@@ -115,9 +133,10 @@ export default function ChallengeSection() {
     const label = labelRef.current;
     const headline = headlineRef.current;
     const intro = introRef.current;
+    const statement = statementRef.current;
     const problems = problemsRef.current;
 
-    if (!root || !label || !headline || !intro || !problems) {
+    if (!root || !label || !headline || !intro || !statement || !problems) {
       return;
     }
 
@@ -126,11 +145,19 @@ export default function ChallengeSection() {
 
     setInitialState(header, cards, reducedMotion);
 
-    if (reducedMotion) return;
+    if (reducedMotion) {
+      gsap.set(statement, { opacity: 1, y: 0 });
+      return;
+    }
+
+    gsap.set(statement, { opacity: 0, y: CHALLENGE_ANIM.statement.y });
 
     const ctx = gsap.context(() => {
       const headerTl = buildHeaderTimeline(header);
       animationRegistry.register(root, "challenge-header", headerTl);
+
+      const statementTl = buildStatementReveal(statement, root);
+      animationRegistry.register(root, "challenge-statement", statementTl);
 
       const cardsTl = buildCardsReveal(cards, root);
       animationRegistry.register(root, "challenge-cards", cardsTl);
@@ -152,19 +179,22 @@ export default function ChallengeSection() {
           <h2 ref={headlineRef} className="section-title">
             {CHALLENGE_HEADLINE}
           </h2>
-          <p ref={introRef} className="section-intro">
-            {CHALLENGE_INTRO}
-          </p>
         </header>
 
-        <div ref={problemsRef} className="card-grid">
-          {CHALLENGES.map((challenge) => (
-            <article key={challenge.id} className="brand-card brand-card--elevated">
-              <div className="card-number" aria-hidden="true">
-                {challenge.icon}
+        <p ref={statementRef} className="challenge-statement">
+          {CHALLENGE_STATEMENT}
+        </p>
+
+        <div ref={problemsRef} className="problem-grid">
+          {PROBLEMS.map((problem) => (
+            <article key={problem.id} className="problem-card">
+              <div className="problem-card__icon" aria-hidden="true">
+                {problem.icon}
               </div>
-              <h3 className="card-title">{challenge.title}</h3>
-              <p className="card-description">{challenge.description}</p>
+              <h3 className="problem-card__title">{problem.title}</h3>
+              <p className="problem-card__description">
+                {problem.description}
+              </p>
             </article>
           ))}
         </div>

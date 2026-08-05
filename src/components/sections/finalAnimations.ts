@@ -1,18 +1,18 @@
 export const FINAL_ANIM = {
   header: {
-    label: { duration: 0.6, y: 15 },
-    headline: { duration: 0.8, y: 30 },
-    intro: { duration: 0.7, y: 20 },
+    label: { duration: 0.8, y: 15 },
+    headline: { duration: 1.5, y: 30 },
+    intro: { duration: 1.2, y: 20 },
   },
 
   cards: {
-    duration: 0.6,
+    duration: 1.0,
     y: 25,
-    stagger: 0.12,
+    stagger: 0.15,
   },
 
   scroll: {
-    start: "top 80%",
+    start: "top 75%",
   },
 
   easing: {

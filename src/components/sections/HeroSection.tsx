@@ -5,8 +5,8 @@ import { useReducedMotion } from "../../lib/scroll/useReducedMotion";
 import { HERO_ANIM } from "./heroAnimations";
 
 const HERO_HEADLINE = "Rooh Afza";
-const HERO_SUBTITLE = "A timeless legacy, reimagined for a new generation.";
-const HERO_CTA_LABEL = "Discover the Vision";
+const HERO_SUBTITLE = "A Century of Tradition. Reimagined for a New Generation.";
+const HERO_CTA_LABEL = "Explore The New Rooh Afza";
 const HERO_SCROLL_LABEL = "Scroll to explore";
 
 const styles = {
@@ -69,12 +69,13 @@ const styles = {
   cta: {
     display: "inline-flex",
     alignItems: "center",
-    gap: "0.5rem",
-    padding: "1rem 2rem",
+    gap: "0.75rem",
+    padding: "1.25rem 2.5rem",
     fontFamily: "var(--font-body)",
-    fontSize: "0.9375rem",
-    fontWeight: 600,
-    letterSpacing: "0.02em",
+    fontSize: "1rem",
+    fontWeight: 700,
+    letterSpacing: "0.04em",
+    textTransform: "uppercase" as const,
     color: "var(--color-text-inverse)",
     backgroundColor: "var(--color-gold)",
     border: "none",
@@ -314,7 +315,7 @@ export default function HeroSection() {
           aria-label={HERO_CTA_LABEL}
         >
           {HERO_CTA_LABEL}
-          <span aria-hidden="true">&darr;</span>
+          <span aria-hidden="true">&rarr;</span>
         </a>
       </div>
 

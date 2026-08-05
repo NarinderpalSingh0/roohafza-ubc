@@ -18,27 +18,21 @@ export default function MarketingSection() {
 
   const reducedMotion = useReducedMotion();
 
-  const marketingCards = [
+  const ecosystem = [
     {
-      number: "01",
-      title: "Instagram",
-      subtitle: "Brand Universe",
-      description:
-        "Visual storytelling that blends Rooh Afza's heritage with modern lifestyle, community, and cultural moments.",
+      channel: "Instagram",
+      role: "Discovery",
+      description: "Visual storytelling that blends heritage with modern lifestyle and cultural moments.",
     },
     {
-      number: "02",
-      title: "YouTube",
-      subtitle: "Story & Trust",
-      description:
-        "Long-form storytelling through brand films, behind-the-scenes content, and deeper emotional connections.",
+      channel: "YouTube",
+      role: "Storytelling",
+      description: "Long-form narratives through brand films, behind-the-scenes, and emotional connections.",
     },
     {
-      number: "03",
-      title: "Email",
-      subtitle: "Personal Connection",
-      description:
-        "Direct relationships through loyalty updates, product launches, and exclusive consumer experiences.",
+      channel: "App",
+      role: "Loyalty",
+      description: "Direct relationships through rewards, personalization, and exclusive experiences.",
     },
   ];
 
@@ -111,9 +105,7 @@ export default function MarketingSection() {
           <p ref={labelRef} className="section-label">Digital Connection</p>
 
           <h2 ref={headlineRef} className="section-title">
-            Three Channels.
-            <br />
-            One Stronger Connection.
+            Rooh Afza Digital World
           </h2>
 
           <p ref={introRef} className="section-intro">
@@ -122,15 +114,22 @@ export default function MarketingSection() {
           </p>
         </header>
 
-        <div ref={cardsRef} className="card-grid card-grid--2">
-          {marketingCards.map((card) => (
-            <article key={card.title} className="brand-card brand-card--accent">
-              <span className="card-number">{card.number}</span>
-              <h3 className="card-title">{card.title}</h3>
-              <p className="card-subtitle">{card.subtitle}</p>
-              <p className="card-description">{card.description}</p>
-            </article>
-          ))}
+        <div ref={cardsRef} className="ecosystem">
+          <div className="ecosystem__center" aria-hidden="true">
+            <span className="ecosystem__core">Community</span>
+          </div>
+
+          <div className="ecosystem__channels">
+            {ecosystem.map((item) => (
+              <article key={item.channel} className="ecosystem__channel">
+                <p className="ecosystem__channel-name">{item.channel}</p>
+                <p className="ecosystem__channel-role">{item.role}</p>
+                <p className="ecosystem__channel-description">
+                  {item.description}
+                </p>
+              </article>
+            ))}
+          </div>
         </div>
       </div>
     </div>

@@ -10,10 +10,22 @@ export const sections: readonly SectionConfig[] = [
     hasAnimation: true,
   },
   {
+    id: SECTION.marquee,
+    component: lazy(() => import("../components/sections/MarqueeSection")),
+    tier: 1,
+    hasAnimation: false,
+  },
+  {
     id: SECTION.heritage,
     component: lazy(() => import("../components/sections/HeritageSection")),
     tier: 1,
     hasAnimation: true,
+  },
+  {
+    id: SECTION["bridge-1"],
+    component: lazy(() => import("../components/sections/BridgeSection")),
+    tier: 1,
+    hasAnimation: false,
   },
   {
     id: SECTION.challenge,
@@ -28,6 +40,12 @@ export const sections: readonly SectionConfig[] = [
     hasAnimation: true,
   },
   {
+    id: SECTION["market-reality"],
+    component: lazy(() => import("../components/sections/MarketRealitySection")),
+    tier: 1,
+    hasAnimation: true,
+  },
+  {
     id: SECTION.personas,
     component: lazy(() => import("../components/sections/PersonasSection")),
     tier: 1,
@@ -38,6 +56,12 @@ export const sections: readonly SectionConfig[] = [
     component: lazy(() => import("../components/sections/IdentitySection")),
     tier: 1,
     hasAnimation: true,
+  },
+  {
+    id: SECTION["bridge-2"],
+    component: lazy(() => import("../components/sections/Bridge2Section")),
+    tier: 1,
+    hasAnimation: false,
   },
   {
     id: SECTION.packaging,
@@ -68,6 +92,12 @@ export const sections: readonly SectionConfig[] = [
     component: lazy(() => import("../components/sections/VisionSection")),
     tier: 1,
     hasAnimation: true,
+  },
+  {
+    id: SECTION["social-proof"],
+    component: lazy(() => import("../components/sections/SocialProofSection")),
+    tier: 1,
+    hasAnimation: false,
   },
   {
     id: SECTION.final,

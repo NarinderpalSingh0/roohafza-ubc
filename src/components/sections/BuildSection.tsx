@@ -18,30 +18,21 @@ export default function BuildSection() {
 
   const reducedMotion = useReducedMotion();
 
-  const buildCards = [
+  const phases = [
     {
       number: "01",
-      title: "Modern Product Innovation",
-      description:
-        "Creating new experiences that respect Rooh Afza's heritage while adapting to evolving consumer needs.",
+      title: "Foundation",
+      description: "Modernize product formats, packaging, and visual identity for contemporary consumers.",
     },
     {
       number: "02",
-      title: "Digital First Ecosystem",
-      description:
-        "Building stronger relationships through technology, community, and direct consumer connections.",
+      title: "Expansion",
+      description: "Build digital ecosystems, community platforms, and direct consumer relationships.",
     },
     {
       number: "03",
-      title: "Global Growth",
-      description:
-        "Expanding Rooh Afza's cultural identity into new international markets.",
-    },
-    {
-      number: "04",
-      title: "Future Ready Brand",
-      description:
-        "A transformation strategy designed for the next generation of consumers.",
+      title: "Global Scale",
+      description: "Carry Indian heritage to international markets with cultural authenticity at the core.",
     },
   ];
 
@@ -114,24 +105,28 @@ export default function BuildSection() {
           <p ref={labelRef} className="section-label">Build The Future</p>
 
           <h2 ref={headlineRef} className="section-title">
-            From Heritage.
-            <br />
-            To Tomorrow.
+            Execution Roadmap
           </h2>
 
           <p ref={introRef} className="section-intro">
-            Building a stronger Rooh Afza through innovation, digital
-            experiences, and meaningful consumer relationships.
+            Three clear phases to transform Rooh Afza from a heritage brand
+            into a global lifestyle icon.
           </p>
         </header>
 
-        <div ref={cardsRef} className="card-grid">
-          {buildCards.map((card) => (
-            <article key={card.title} className="brand-card brand-card--elevated">
-              <span className="card-number">{card.number}</span>
-              <h3 className="card-title">{card.title}</h3>
-              <p className="card-description">{card.description}</p>
-            </article>
+        <div ref={cardsRef} className="phase-blocks">
+          {phases.map((phase) => (
+            <div key={phase.number} className="phase-block">
+              <div className="phase-block__number" aria-hidden="true">
+                {phase.number}
+              </div>
+              <div className="phase-block__content">
+                <h3 className="phase-block__title">{phase.title}</h3>
+                <p className="phase-block__description">
+                  {phase.description}
+                </p>
+              </div>
+            </div>
           ))}
         </div>
       </div>
