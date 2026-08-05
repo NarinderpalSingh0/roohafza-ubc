@@ -853,67 +853,58 @@
 
 /* Heritage Marquee — thin ticker strip */
 .marquee {
-  position: relative;
   height: 56px;
   min-height: 56px;
   max-height: 56px;
-  padding: 0;
-  margin: 0;
   overflow: hidden;
+  background: #8A1538;
   display: flex;
   align-items: center;
-  background-color: var(--color-primary);
-  white-space: nowrap;
-  contain: layout;
 }
 
 .marquee__track {
   display: flex;
   width: max-content;
-  align-items: center;
-  margin: 0;
-  padding: 0;
+  height: 100%;
   animation: marquee-scroll 25s linear infinite;
   will-change: transform;
 }
 
-.marquee:hover .marquee__track {
-  animation-play-state: paused;
+.marquee__group {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  height: 56px;
 }
 
 .marquee__item {
   display: flex;
   align-items: center;
   height: 56px;
-  margin: 0;
-  padding: 0;
-  font-family: var(--font-body);
+  padding: 0 24px;
+  color: #FFF7F2;
   font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--color-cream);
-  flex-shrink: 0;
+  letter-spacing: 2px;
+  white-space: nowrap;
   line-height: 1;
 }
 
 .marquee__separator {
-  display: flex;
-  align-items: center;
-  height: 56px;
-  margin: 0;
-  padding: 0;
-  color: var(--color-gold);
-  line-height: 1;
+  margin-left: 24px;
+  color: #D4AF37;
 }
 
 @keyframes marquee-scroll {
-  0% {
+  from {
     transform: translateX(0);
   }
-  100% {
+  to {
     transform: translateX(-50%);
   }
+}
+
+.marquee:hover .marquee__track {
+  animation-play-state: paused;
 }
 
 /* Social Proof Strip */

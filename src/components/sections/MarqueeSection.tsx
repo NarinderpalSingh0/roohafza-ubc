@@ -1,27 +1,27 @@
 export default function MarqueeSection() {
   const items = [
-    "100+ Years of Trust",
-    "30+ Botanical Ingredients",
-    "4 Generations Connected",
-    "One Timeless Legacy",
+    "100+ YEARS OF TRUST",
+    "30+ BOTANICAL INGREDIENTS",
+    "4 GENERATIONS CONNECTED",
+    "ONE TIMELESS LEGACY",
   ];
 
   const group = (
     <>
-      {items.map((item, i) => (
-        <span key={i} className="marquee__item">
+      {items.map((item, index) => (
+        <span className="marquee__item" key={index}>
           {item}
-          <span className="marquee__separator">&nbsp;&nbsp;&nbsp;&#10022;&nbsp;&nbsp;&nbsp;</span>
+          <span className="marquee__separator">&#10022;</span>
         </span>
       ))}
     </>
   );
 
   return (
-    <div className="marquee" aria-hidden="true">
+    <div className="marquee">
       <div className="marquee__track">
-        {group}
-        {group}
+        <div className="marquee__group">{group}</div>
+        <div className="marquee__group">{group}</div>
       </div>
     </div>
   );
