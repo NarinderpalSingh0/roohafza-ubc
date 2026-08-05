@@ -69,7 +69,8 @@ const styles = {
     lineHeight: 1.1,
     letterSpacing: "-0.02em",
     color: "var(--color-text-primary)",
-    margin: "0",
+    maxWidth: "36rem",
+    margin: "0 auto",
   },
   intro: {
     fontFamily: "var(--font-body)",
