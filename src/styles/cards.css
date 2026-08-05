@@ -853,6 +853,7 @@
 
 /* Heritage Marquee — thin ticker strip */
 .marquee {
+  position: relative;
   height: 56px;
   min-height: 56px;
   max-height: 56px;
@@ -863,6 +864,7 @@
   align-items: center;
   background-color: var(--color-primary);
   white-space: nowrap;
+  contain: layout;
 }
 
 .marquee__track {
