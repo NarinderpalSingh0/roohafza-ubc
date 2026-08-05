@@ -47,11 +47,11 @@ const styles = {
   container: {
     maxWidth: "var(--spacing-container-max)",
     margin: "0 auto",
-    padding: "clamp(3rem, 6vw, 5rem) var(--spacing-container-padding)",
+    padding: "var(--spacing-section-lg) var(--spacing-container-padding)",
   },
   header: {
     textAlign: "center" as const,
-    marginBottom: "clamp(2rem, 4vw, 3rem)",
+    marginBottom: "clamp(3rem, 6vw, 5rem)",
   },
   label: {
     fontFamily: "var(--font-body)",
