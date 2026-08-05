@@ -6,17 +6,22 @@ export default function MarqueeSection() {
     "One Timeless Legacy",
   ];
 
-  const repeatedItems = [...items, ...items, ...items, ...items];
+  const group = (
+    <>
+      {items.map((item, i) => (
+        <span key={i} className="marquee__item">
+          {item}
+          <span className="marquee__separator">&nbsp;&nbsp;&nbsp;&#10022;&nbsp;&nbsp;&nbsp;</span>
+        </span>
+      ))}
+    </>
+  );
 
   return (
     <div className="marquee" aria-hidden="true">
       <div className="marquee__track">
-        {repeatedItems.map((item, index) => (
-          <span key={index} className="marquee__item">
-            {item}
-            <span className="marquee__separator">&nbsp;&nbsp;&nbsp;&#10022;&nbsp;&nbsp;&nbsp;</span>
-          </span>
-        ))}
+        {group}
+        {group}
       </div>
     </div>
   );

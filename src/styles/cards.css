@@ -868,12 +868,17 @@
 }
 
 .marquee__track {
-  height: 100%;
   display: flex;
+  width: max-content;
   align-items: center;
   margin: 0;
   padding: 0;
-  animation: marquee-scroll 30s linear infinite;
+  animation: marquee-scroll 25s linear infinite;
+  will-change: transform;
+}
+
+.marquee:hover .marquee__track {
+  animation-play-state: paused;
 }
 
 .marquee__item {
