@@ -18,7 +18,7 @@ const styles = {
     flexDirection: "column" as const,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "var(--color-bg-hero)",
+    backgroundColor: "#8A1538",
     overflow: "hidden",
   },
   background: {
