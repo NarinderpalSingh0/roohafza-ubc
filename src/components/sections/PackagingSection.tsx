@@ -1,23 +1,15 @@
 import { useEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-import { PACKAGING_ANIM } from "./packagingAnimations";
-import { animationRegistry } from "../../lib/animations/registry";
-import { useReducedMotion } from "../../lib/scroll/useReducedMotion";
+import { useInView } from "../../lib/animations/useInView";
 import ImageAsset from "../ui/ImageAsset";
 
-gsap.registerPlugin(ScrollTrigger);
-
 export default function PackagingSection() {
+  const { ref: sectionRef, isInView } = useInView();
   const rootRef = useRef<HTMLDivElement>(null);
 
   const labelRef = useRef<HTMLParagraphElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const introRef = useRef<HTMLParagraphElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
-
-  const reducedMotion = useReducedMotion();
 
   const features = [
     {
@@ -44,99 +36,18 @@ export default function PackagingSection() {
 
   useEffect(() => {
     const root = rootRef.current;
-
     if (!root) return;
 
-    if (reducedMotion) {
-      gsap.set(root.querySelectorAll("*"), {
-        opacity: 1,
-        y: 0,
-      });
-      return;
-    }
+    // Content is always visible - no GSAP opacity animations
+    // Scroll-based enhancements can be added later
 
-    const productEl = root.querySelector(".product-hero__visual");
-    const captionEl = root.querySelector(".product-hero__caption");
-
-    const ctx = gsap.context(() => {
-      const timeline = gsap.timeline({
-        scrollTrigger: {
-          trigger: root,
-          start: PACKAGING_ANIM.scroll.start,
-        },
-      });
-
-      timeline
-        .from(labelRef.current, {
-          ...PACKAGING_ANIM.header.label,
-          opacity: 0,
-          ease: PACKAGING_ANIM.easing.reveal,
-        })
-        .from(headlineRef.current, {
-          ...PACKAGING_ANIM.header.headline,
-          opacity: 0,
-          ease: PACKAGING_ANIM.easing.reveal,
-        })
-        .from(introRef.current, {
-          ...PACKAGING_ANIM.header.intro,
-          opacity: 0,
-          ease: PACKAGING_ANIM.easing.reveal,
-        });
-
-      if (productEl) {
-        gsap.from(productEl, {
-          opacity: 0,
-          scale: PACKAGING_ANIM.product.scale,
-          duration: PACKAGING_ANIM.product.duration,
-          ease: PACKAGING_ANIM.easing.reveal,
-          scrollTrigger: {
-            trigger: productEl,
-            start: PACKAGING_ANIM.scroll.start,
-          },
-        });
-      }
-
-      if (captionEl) {
-        gsap.from(captionEl, {
-          opacity: 0,
-          y: PACKAGING_ANIM.caption.y,
-          duration: PACKAGING_ANIM.caption.duration,
-          ease: PACKAGING_ANIM.easing.reveal,
-          scrollTrigger: {
-            trigger: captionEl,
-            start: PACKAGING_ANIM.scroll.start,
-          },
-        });
-      }
-
-      const cards = cardsRef.current?.children;
-
-      if (cards) {
-        gsap.from(cards, {
-          ...PACKAGING_ANIM.features,
-          opacity: 0,
-          stagger: PACKAGING_ANIM.features.stagger,
-          ease: PACKAGING_ANIM.easing.reveal,
-          scrollTrigger: {
-            trigger: cardsRef.current,
-            start: PACKAGING_ANIM.scroll.start,
-          },
-        });
-      }
-
-      animationRegistry.register(root, "packaging-header", timeline);
-    }, root);
-
-    return () => {
-      ctx.revert();
-      animationRegistry.killAll(root);
-    };
-  }, [reducedMotion]);
+    return () => {};
+  }, []);
 
   return (
-    <div ref={rootRef} className="brand-section brand-section--primary">
+    <div ref={sectionRef} className="brand-section brand-section--primary">
       <div className="section-container">
-        <header className="section-header">
+        <header className={`section-header ${isInView ? 'fade-in-up is-visible' : 'fade-in-up'}`}>
           <p ref={labelRef} className="section-label">Packaging Evolution</p>
 
           <h2 ref={headlineRef} className="section-title">
@@ -166,15 +77,17 @@ export default function PackagingSection() {
           </p>
         </div>
 
-        <div ref={cardsRef} className="product-features">
-          {features.map((feature) => (
-            <div key={feature.title} className="product-feature">
-              <h3 className="product-feature__title">{feature.title}</h3>
-              <p className="product-feature__description">
-                {feature.description}
-              </p>
-            </div>
-          ))}
+        <div ref={cardsRef} className={`${isInView ? 'fade-in-up is-visible animate-delay-2' : 'fade-in-up'}`}>
+          <div className="product-features">
+            {features.map((feature) => (
+              <div key={feature.title} className="product-feature">
+                <h3 className="product-feature__title">{feature.title}</h3>
+                <p className="product-feature__description">
+                  {feature.description}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="section-cta">

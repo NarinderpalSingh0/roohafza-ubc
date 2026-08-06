@@ -2,6 +2,7 @@ import { Suspense, useRef, useEffect } from "react";
 import { sections } from "../../lib/registry";
 import { useScrollContext } from "../../lib/scroll/ScrollContext";
 import type { SectionId } from "../../types";
+import Footer from "../sections/Footer";
 
 function SectionFallback() {
   return (
@@ -52,6 +53,7 @@ export function SectionRenderer() {
           </Suspense>
         </section>
       ))}
+      <Footer />
     </>
   );
 }

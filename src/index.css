@@ -68,9 +68,9 @@
   --radius-2xl: 1.5rem;
   --radius-full: 9999px;
 
-  --spacing-section-sm: 4rem;
-  --spacing-section-md: 6rem;
-  --spacing-section-lg: 8rem;
+  --spacing-section-sm: clamp(2.5rem, 5vw, 4rem);
+  --spacing-section-md: clamp(3rem, 6vw, 6rem);
+  --spacing-section-lg: clamp(4rem, 8vw, 8rem);
   --spacing-container-max: 1280px;
   --spacing-container-padding: 2rem;
 }

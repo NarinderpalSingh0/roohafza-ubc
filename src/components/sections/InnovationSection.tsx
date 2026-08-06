@@ -1,14 +1,8 @@
 import { useEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-import { INNOVATION_ANIM } from "./innovationAnimations";
-import { animationRegistry } from "../../lib/animations/registry";
-import { useReducedMotion } from "../../lib/scroll/useReducedMotion";
-
-gsap.registerPlugin(ScrollTrigger);
+import { useInView } from "../../lib/animations/useInView";
 
 export default function InnovationSection() {
+  const { ref: sectionRef, isInView } = useInView();
   const rootRef = useRef<HTMLDivElement>(null);
 
   const labelRef = useRef<HTMLParagraphElement>(null);
@@ -16,101 +10,47 @@ export default function InnovationSection() {
   const introRef = useRef<HTMLParagraphElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
 
-  const reducedMotion = useReducedMotion();
-
   const evolution = [
     {
       stage: "Today",
       product: "Rooh Afza Syrup",
       description: "The original. A century of trust in every bottle.",
+      image: "/assets/images/packaging/bottles.jpg",
     },
     {
       stage: "Next",
       product: "Ready-to-Drink",
       description: "Convenient, modern formats for on-the-go consumers.",
+      image: "/assets/images/hero/can-floral.png",
     },
     {
       stage: "Future",
       product: "Wellness Formats",
       description: "Health-conscious variants rooted in traditional knowledge.",
+      image: "/assets/images/innovation/can-green.png",
     },
     {
       stage: "Vision",
       product: "Global Lifestyle Brand",
       description: "Beyond beverage — a cultural identity carried worldwide.",
+      image: "/assets/images/innovation/cafe-collection.png",
     },
   ];
 
   useEffect(() => {
     const root = rootRef.current;
-
     if (!root) return;
 
-    if (reducedMotion) {
-      gsap.set(root.querySelectorAll("*"), {
-        opacity: 1,
-        y: 0,
-      });
-      return;
-    }
+    // Content is always visible - no GSAP opacity animations
+    // Scroll-based enhancements can be added later
 
-    const ctx = gsap.context(() => {
-      const timeline = gsap.timeline({
-        scrollTrigger: {
-          trigger: root,
-          start: INNOVATION_ANIM.scroll.start,
-        },
-      });
-
-      timeline
-        .from(labelRef.current, {
-          ...INNOVATION_ANIM.header.label,
-          opacity: 0,
-          ease: INNOVATION_ANIM.easing.reveal,
-        })
-        .from(headlineRef.current, {
-          ...INNOVATION_ANIM.header.headline,
-          opacity: 0,
-          ease: INNOVATION_ANIM.easing.reveal,
-        })
-        .from(introRef.current, {
-          ...INNOVATION_ANIM.header.intro,
-          opacity: 0,
-          ease: INNOVATION_ANIM.easing.reveal,
-        });
-
-      const cards = cardsRef.current?.children;
-
-      if (cards) {
-        gsap.from(cards, {
-          ...INNOVATION_ANIM.stages,
-          opacity: 0,
-          stagger: INNOVATION_ANIM.stages.stagger,
-          ease: INNOVATION_ANIM.easing.reveal,
-          scrollTrigger: {
-            trigger: cardsRef.current,
-            start: INNOVATION_ANIM.scroll.start,
-          },
-        });
-      }
-
-      animationRegistry.register(
-        root,
-        "innovation-header",
-        timeline,
-      );
-    }, root);
-
-    return () => {
-      ctx.revert();
-      animationRegistry.killAll(root);
-    };
-  }, [reducedMotion]);
+    return () => {};
+  }, []);
 
   return (
-    <div ref={rootRef} className="brand-section brand-section--secondary">
+    <div ref={sectionRef} className="brand-section brand-section--secondary">
       <div className="section-container">
-        <header className="section-header">
+        <header className={`section-header ${isInView ? 'fade-in-up is-visible' : 'fade-in-up'}`}>
           <p ref={labelRef} className="section-label">Innovation & Future</p>
 
           <h2 ref={headlineRef} className="section-title">
@@ -123,21 +63,31 @@ export default function InnovationSection() {
           </p>
         </header>
 
-        <div ref={cardsRef} className="evolution-map">
-          {evolution.map((item, index) => (
-            <div key={item.stage} className="evolution-map__stage">
-              <div className="evolution-map__marker">
-                <span className="evolution-map__stage-label">{item.stage}</span>
-                {index < evolution.length - 1 && (
-                  <span className="evolution-map__connector" />
-                )}
+        <div ref={cardsRef} className={`${isInView ? 'fade-in-up is-visible animate-delay-2' : 'fade-in-up'}`}>
+          <div className="evolution-map">
+            {evolution.map((item, index) => (
+              <div key={item.stage} className="evolution-map__stage">
+                <div className="evolution-map__marker">
+                  <span className="evolution-map__stage-label">{item.stage}</span>
+                  {index < evolution.length - 1 && (
+                    <span className="evolution-map__connector" />
+                  )}
+                </div>
+                <div className="evolution-map__content">
+                  <div className="evolution-map__image-wrapper">
+                    <img
+                      src={item.image}
+                      alt={item.product}
+                      className="evolution-map__image"
+                      loading="lazy"
+                    />
+                  </div>
+                  <h3 className="evolution-map__product">{item.product}</h3>
+                  <p className="evolution-map__description">{item.description}</p>
+                </div>
               </div>
-              <div className="evolution-map__content">
-                <h3 className="evolution-map__product">{item.product}</h3>
-                <p className="evolution-map__description">{item.description}</p>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         <div className="section-cta">

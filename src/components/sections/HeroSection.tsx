@@ -24,7 +24,11 @@ const styles = {
   background: {
     position: "absolute" as const,
     inset: 0,
-    background: "linear-gradient(160deg, var(--color-primary) 0%, var(--color-primary-dark) 50%, var(--color-charcoal) 100%)",
+    background: `
+      radial-gradient(ellipse 80% 50% at 50% 0%, rgba(212, 175, 55, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(138, 21, 56, 0.3) 0%, transparent 50%),
+      linear-gradient(160deg, var(--color-primary) 0%, var(--color-primary-dark) 50%, var(--color-charcoal) 100%)
+    `,
     zIndex: 0,
   },
   content: {
@@ -35,7 +39,7 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
     textAlign: "center" as const,
-    padding: "var(--spacing-container-padding)",
+    padding: "clamp(2rem, 5vw, 4rem) var(--spacing-container-padding)",
     maxWidth: "var(--spacing-container-max)",
     width: "100%",
   },
@@ -43,28 +47,28 @@ const styles = {
     fontFamily: "var(--font-heading)",
     fontSize: "var(--font-size-xs, 0.75rem)",
     fontWeight: 600,
-    letterSpacing: "0.2em",
+    letterSpacing: "0.25em",
     textTransform: "uppercase" as const,
     color: "var(--color-text-gold)",
-    marginBottom: "2rem",
+    marginBottom: "2.5rem",
   },
   headline: {
     fontFamily: "var(--font-heading)",
-    fontSize: "clamp(3rem, 8vw, 8rem)",
+    fontSize: "clamp(3.5rem, 10vw, 9rem)",
     fontWeight: 700,
-    lineHeight: 1.05,
-    letterSpacing: "-0.03em",
+    lineHeight: 1.0,
+    letterSpacing: "-0.04em",
     color: "var(--color-text-inverse)",
-    margin: "0 0 1.5rem",
+    margin: "0 0 2rem",
   },
   subtitle: {
     fontFamily: "var(--font-body)",
     fontSize: "clamp(1rem, 2vw, 1.375rem)",
     fontWeight: 400,
-    lineHeight: 1.6,
-    color: "rgba(255, 255, 255, 0.8)",
-    maxWidth: "36rem",
-    margin: "0 0 2.5rem",
+    lineHeight: 1.7,
+    color: "rgba(255, 255, 255, 0.75)",
+    maxWidth: "32rem",
+    margin: "0 auto 3rem",
   },
   cta: {
     display: "inline-flex",
@@ -72,119 +76,42 @@ const styles = {
     gap: "0.75rem",
     padding: "1.25rem 2.5rem",
     fontFamily: "var(--font-body)",
-    fontSize: "1rem",
+    fontSize: "0.875rem",
     fontWeight: 700,
-    letterSpacing: "0.04em",
+    letterSpacing: "0.08em",
     textTransform: "uppercase" as const,
-    color: "var(--color-text-inverse)",
+    color: "var(--color-charcoal)",
     backgroundColor: "var(--color-gold)",
     border: "none",
     borderRadius: "var(--radius-md)",
     cursor: "pointer",
     textDecoration: "none",
-    transition: "background-color 0.2s ease, transform 0.2s ease",
+    transition: "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
+  },
+  ctaArrow: {
+    transition: "transform 0.3s ease",
   },
   scrollIndicator: {
     position: "absolute" as const,
-    bottom: "2rem",
+    bottom: "2.5rem",
     left: "50%",
     transform: "translateX(-50%)",
     display: "flex",
     flexDirection: "column" as const,
     alignItems: "center",
-    gap: "0.5rem",
-    color: "rgba(255, 255, 255, 0.6)",
+    gap: "0.75rem",
+    color: "rgba(255, 255, 255, 0.5)",
     fontFamily: "var(--font-body)",
-    fontSize: "0.75rem",
-    letterSpacing: "0.1em",
+    fontSize: "0.6875rem",
+    letterSpacing: "0.15em",
     textTransform: "uppercase" as const,
   },
   scrollLine: {
     width: "1px",
-    height: "2.5rem",
-    backgroundColor: "rgba(255, 255, 255, 0.4)",
+    height: "3rem",
+    background: "linear-gradient(to bottom, rgba(255, 255, 255, 0.4), transparent)",
   },
 } as const;
-
-function setInitialState(
-  refs: {
-    background: HTMLDivElement;
-    brandMark: HTMLParagraphElement;
-    headline: HTMLHeadingElement;
-    subtitle: HTMLParagraphElement;
-    cta: HTMLAnchorElement;
-    scrollIndicator: HTMLDivElement;
-  },
-  reduced: boolean,
-) {
-  if (reduced) {
-    gsap.set(refs.background, { opacity: 1 });
-    gsap.set(refs.brandMark, { opacity: 1, y: 0 });
-    gsap.set(refs.headline, { opacity: 1, y: 0 });
-    gsap.set(refs.subtitle, { opacity: 1, y: 0 });
-    gsap.set(refs.cta, { opacity: 1, scale: 1 });
-    gsap.set(refs.scrollIndicator, { opacity: 1 });
-    return;
-  }
-
-  gsap.set(refs.background, { opacity: 0 });
-  gsap.set(refs.brandMark, { opacity: 0, y: HERO_ANIM.entrance.brandMark.y });
-  gsap.set(refs.headline, { opacity: 0, y: HERO_ANIM.entrance.headline.y });
-  gsap.set(refs.subtitle, { opacity: 0, y: HERO_ANIM.entrance.subtitle.y });
-  gsap.set(refs.cta, { opacity: 0, scale: HERO_ANIM.entrance.cta.scale });
-  gsap.set(refs.scrollIndicator, { opacity: 0 });
-}
-
-function buildEntranceTimeline(
-  refs: {
-    background: HTMLDivElement;
-    brandMark: HTMLParagraphElement;
-    headline: HTMLHeadingElement;
-    subtitle: HTMLParagraphElement;
-    cta: HTMLAnchorElement;
-    scrollIndicator: HTMLDivElement;
-  },
-) {
-  const { entrance: e } = HERO_ANIM;
-
-  return gsap.timeline({
-    defaults: { ease: HERO_ANIM.easing.entrance },
-  })
-    .to(refs.background, {
-      opacity: 1,
-      duration: e.background.duration,
-      delay: e.background.delay,
-    })
-    .to(refs.brandMark, {
-      opacity: 1,
-      y: 0,
-      duration: e.brandMark.duration,
-      delay: e.brandMark.delay,
-    }, "<")
-    .to(refs.headline, {
-      opacity: 1,
-      y: 0,
-      duration: e.headline.duration,
-      delay: e.headline.delay,
-    }, "<0.1")
-    .to(refs.subtitle, {
-      opacity: 1,
-      y: 0,
-      duration: e.subtitle.duration,
-      delay: e.subtitle.delay,
-    }, "<0.2")
-    .to(refs.cta, {
-      opacity: 1,
-      scale: 1,
-      duration: e.cta.duration,
-      delay: e.cta.delay,
-    }, "<0.1")
-    .to(refs.scrollIndicator, {
-      opacity: 1,
-      duration: e.scrollIndicator.duration,
-      delay: e.scrollIndicator.delay,
-    }, "<0.3");
-}
 
 function buildScrollTimeline(
   refs: {
@@ -258,14 +185,24 @@ export default function HeroSection() {
 
     const refs = { root, background, brandMark, headline, subtitle, cta, scrollIndicator };
 
-    setInitialState(refs, reducedMotion);
+    if (reducedMotion) {
+      gsap.set(refs.background, { opacity: 1 });
+      gsap.set(refs.brandMark, { opacity: 1, y: 0 });
+      gsap.set(refs.headline, { opacity: 1, y: 0 });
+      gsap.set(refs.subtitle, { opacity: 1, y: 0 });
+      gsap.set(refs.cta, { opacity: 1, scale: 1 });
+      gsap.set(refs.scrollIndicator, { opacity: 1 });
+      return;
+    }
 
-    if (reducedMotion) return;
+    gsap.set(refs.background, { opacity: 1 });
+    gsap.set(refs.brandMark, { opacity: 1, y: 0 });
+    gsap.set(refs.headline, { opacity: 1, y: 0 });
+    gsap.set(refs.subtitle, { opacity: 1, y: 0 });
+    gsap.set(refs.cta, { opacity: 1, scale: 1 });
+    gsap.set(refs.scrollIndicator, { opacity: 1 });
 
     const ctx = gsap.context(() => {
-      const entranceTl = buildEntranceTimeline(refs);
-      animationRegistry.register(root, "hero-entrance", entranceTl);
-
       const scrollTl = buildScrollTimeline(refs);
       animationRegistry.register(root, "hero-scroll", scrollTl);
     });
@@ -313,9 +250,21 @@ export default function HeroSection() {
             }
           }}
           aria-label={HERO_CTA_LABEL}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = "translateY(-2px)";
+            e.currentTarget.style.boxShadow = "0 8px 30px rgba(212, 175, 55, 0.35)";
+            const arrow = e.currentTarget.querySelector("span");
+            if (arrow) arrow.style.transform = "translateX(4px)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "translateY(0)";
+            e.currentTarget.style.boxShadow = "none";
+            const arrow = e.currentTarget.querySelector("span");
+            if (arrow) arrow.style.transform = "translateX(0)";
+          }}
         >
           {HERO_CTA_LABEL}
-          <span aria-hidden="true">&rarr;</span>
+          <span style={styles.ctaArrow} aria-hidden="true">&rarr;</span>
         </a>
       </div>
 
@@ -325,7 +274,7 @@ export default function HeroSection() {
         aria-hidden="true"
       >
         <span>{HERO_SCROLL_LABEL}</span>
-        <div style={styles.scrollLine} />
+        <div style={styles.scrollLine} className="float" />
       </div>
     </div>
   );

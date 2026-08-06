@@ -1,8 +1,5 @@
 import { useRef, useEffect } from "react";
-import { gsap } from "../../lib/gsap";
-import { animationRegistry } from "../../lib/animations/registry";
-import { useReducedMotion } from "../../lib/scroll/useReducedMotion";
-import { HERITAGE_ANIM } from "./heritageAnimations";
+import { useInView } from "../../lib/animations/useInView";
 
 const HERITAGE_LABEL = "Our Story";
 const HERITAGE_HEADLINE = "A Century of Tradition";
@@ -36,6 +33,29 @@ const VALUES = [
   { label: "Natural", description: "30+ herbs, fruits, and flowers" },
   { label: "Community", description: "Beloved across generations and borders" },
 ] as const;
+
+const TEAM = [
+  {
+    name: "Narinderpal Singh",
+    role: "Developer",
+    image: "/assets/images/heritage/team-narinderpal.png",
+  },
+  {
+    name: "Mannat Arora",
+    role: "Designer",
+    image: "/assets/images/heritage/team-mannat.png",
+  },
+  {
+    name: "Kashika Bhatia",
+    role: "Strategist",
+    image: "/assets/images/heritage/team-kashika.png",
+  },
+  {
+    name: "Manraj Singh Chandi",
+    role: "Researcher",
+    image: "/assets/images/heritage/team-manraj.png",
+  },
+];
 
 const styles = {
   root: {
@@ -178,125 +198,68 @@ const styles = {
     color: "var(--color-text-secondary)",
     margin: 0,
   },
+  team: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 14rem), 1fr))",
+    gap: "clamp(2rem, 4vw, 3rem)",
+    marginTop: "clamp(4rem, 8vw, 6rem)",
+    paddingTop: "clamp(3rem, 6vw, 4rem)",
+    borderTop: "1px solid var(--color-border-subtle)",
+  },
+  teamMember: {
+    display: "flex",
+    flexDirection: "column" as const,
+    alignItems: "center",
+    textAlign: "center" as const,
+  },
+  teamImageWrapper: {
+    width: "8rem",
+    height: "8rem",
+    borderRadius: "50%",
+    overflow: "hidden",
+    marginBottom: "1.5rem",
+    border: "2px solid var(--color-border-accent)",
+    transition: "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease",
+    cursor: "pointer",
+  },
+  teamImage: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    transition: "transform 0.4s ease",
+  },
+  teamPlaceholder: {
+    width: "100%",
+    height: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "var(--color-primary)",
+    color: "var(--color-cream)",
+    fontFamily: "var(--font-heading)",
+    fontSize: "1.5rem",
+    fontWeight: 600,
+  },
+  teamName: {
+    fontFamily: "var(--font-heading)",
+    fontSize: "clamp(1.125rem, 2vw, 1.25rem)",
+    fontWeight: 600,
+    color: "var(--color-text-primary)",
+    margin: "0 0 0.375rem",
+  },
+  teamRole: {
+    fontFamily: "var(--font-body)",
+    fontSize: "0.875rem",
+    fontWeight: 500,
+    letterSpacing: "0.1em",
+    textTransform: "uppercase" as const,
+    color: "var(--color-text-gold)",
+    margin: 0,
+  },
 } as const;
 
-type HeaderRefs = {
-  label: HTMLParagraphElement;
-  headline: HTMLHeadingElement;
-  intro: HTMLParagraphElement;
-};
-
-type TimelineRefs = {
-  line: HTMLDivElement;
-  milestones: HTMLElement[];
-};
-
-type ValuesRefs = {
-  cards: HTMLElement[];
-};
-
-function setInitialState(
-  header: HeaderRefs,
-  timeline: TimelineRefs,
-  values: ValuesRefs,
-  reduced: boolean,
-) {
-  if (reduced) {
-    gsap.set(header.label, { opacity: 1, y: 0 });
-    gsap.set(header.headline, { opacity: 1, y: 0 });
-    gsap.set(header.intro, { opacity: 1, y: 0 });
-    gsap.set(timeline.line, { scaleY: 1 });
-    gsap.set(timeline.milestones, { opacity: 1, y: 0 });
-    gsap.set(values.cards, { opacity: 1, y: 0 });
-    return;
-  }
-
-  const h = HERITAGE_ANIM.header;
-  const t = HERITAGE_ANIM.timeline.milestone;
-  const v = HERITAGE_ANIM.values.card;
-
-  gsap.set(header.label, { opacity: 0, y: h.label.y });
-  gsap.set(header.headline, { opacity: 0, y: h.headline.y });
-  gsap.set(header.intro, { opacity: 0, y: h.intro.y });
-  gsap.set(timeline.line, { scaleY: 0 });
-  gsap.set(timeline.milestones, { opacity: 0, y: t.y });
-  gsap.set(values.cards, { opacity: 0, y: v.y });
-}
-
-function buildHeaderTimeline(header: HeaderRefs) {
-  const h = HERITAGE_ANIM.header;
-
-  return gsap.timeline({
-    defaults: { ease: HERITAGE_ANIM.easing.reveal },
-  })
-    .to(header.label, {
-      opacity: 1,
-      y: 0,
-      duration: h.label.duration,
-    })
-    .to(header.headline, {
-      opacity: 1,
-      y: 0,
-      duration: h.headline.duration,
-    }, "<0.1")
-    .to(header.intro, {
-      opacity: 1,
-      y: 0,
-      duration: h.intro.duration,
-    }, "<0.15");
-}
-
-function buildTimelineReveal(
-  timeline: TimelineRefs,
-  sectionEl: HTMLDivElement,
-) {
-  const t = HERITAGE_ANIM.timeline;
-
-  return gsap.timeline({
-    scrollTrigger: {
-      trigger: sectionEl,
-      start: HERITAGE_ANIM.scroll.start,
-      end: HERITAGE_ANIM.scroll.end,
-      toggleActions: "play none none reverse",
-    },
-  })
-    .to(timeline.line, {
-      scaleY: 1,
-      duration: t.lineDuration,
-      ease: "none",
-    })
-    .to(timeline.milestones, {
-      opacity: 1,
-      y: 0,
-      duration: t.milestone.duration,
-      stagger: t.milestone.stagger,
-      ease: HERITAGE_ANIM.easing.reveal,
-    }, 0.3);
-}
-
-function buildValuesReveal(
-  values: ValuesRefs,
-  sectionEl: HTMLDivElement,
-) {
-  const v = HERITAGE_ANIM.values.card;
-
-  return gsap.timeline({
-    scrollTrigger: {
-      trigger: sectionEl,
-      start: "bottom 80%",
-      toggleActions: "play none none reverse",
-    },
-  })
-    .to(values.cards, {
-      opacity: 1,
-      y: 0,
-      duration: v.duration,
-      stagger: v.stagger,
-      ease: HERITAGE_ANIM.easing.reveal,
-    });
-}
-
 export default function HeritageSection() {
+  const { ref: sectionRef, isInView } = useInView();
   const rootRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLParagraphElement>(null);
@@ -305,57 +268,21 @@ export default function HeritageSection() {
   const timelineRef = useRef<HTMLDivElement>(null);
   const timelineLineRef = useRef<HTMLDivElement>(null);
   const valuesRef = useRef<HTMLDivElement>(null);
-  const reducedMotion = useReducedMotion();
 
   useEffect(() => {
     const root = rootRef.current;
-    const label = labelRef.current;
-    const headline = headlineRef.current;
-    const intro = introRef.current;
-    const timelineEl = timelineRef.current;
-    const timelineLine = timelineLineRef.current;
-    const valuesEl = valuesRef.current;
+    if (!root) return;
 
-    if (!root || !label || !headline || !intro || !timelineEl || !timelineLine || !valuesEl) {
-      return;
-    }
+    // Content is always visible - no GSAP opacity animations
+    // Scroll-based enhancements can be added later
 
-    const milestoneEls = Array.from(
-      timelineEl.querySelectorAll<HTMLElement>('[role="listitem"]'),
-    );
-    const valueCards = Array.from(
-      valuesEl.children,
-    ) as HTMLElement[];
-
-    const header: HeaderRefs = { label, headline, intro };
-    const timeline: TimelineRefs = { line: timelineLine, milestones: milestoneEls };
-    const values: ValuesRefs = { cards: valueCards };
-
-    setInitialState(header, timeline, values, reducedMotion);
-
-    if (reducedMotion) return;
-
-    const ctx = gsap.context(() => {
-      const headerTl = buildHeaderTimeline(header);
-      animationRegistry.register(root, "heritage-header", headerTl);
-
-      const timelineTl = buildTimelineReveal(timeline, root);
-      animationRegistry.register(root, "heritage-timeline", timelineTl);
-
-      const valuesTl = buildValuesReveal(values, root);
-      animationRegistry.register(root, "heritage-values", valuesTl);
-    });
-
-    return () => {
-      animationRegistry.killAll(root);
-      ctx.revert();
-    };
-  }, [reducedMotion]);
+    return () => {};
+  }, []);
 
   return (
-    <div ref={rootRef} style={styles.root}>
+    <div ref={sectionRef} style={styles.root}>
       <div style={styles.container}>
-        <header ref={headerRef} style={styles.header}>
+        <header ref={headerRef} className={`${isInView ? 'fade-in-up is-visible' : 'fade-in-up'}`} style={styles.header}>
           <p ref={labelRef} style={styles.label}>
             {HERITAGE_LABEL}
           </p>
@@ -369,9 +296,25 @@ export default function HeritageSection() {
 
         <div ref={timelineRef} style={styles.timeline} role="list" aria-label="Brand timeline">
           <div ref={timelineLineRef} style={styles.timelineLine} aria-hidden="true" />
-          {MILESTONES.map((milestone) => (
-            <article key={milestone.year} style={styles.milestone} role="listitem">
-              <div style={styles.milestoneDot} aria-hidden="true">
+          {MILESTONES.map((milestone, index) => (
+            <article
+              key={milestone.year}
+              className={`${isInView ? `fade-in-up is-visible animate-delay-${index + 1}` : 'fade-in-up'}`}
+              style={styles.milestone}
+              role="listitem"
+            >
+              <div
+                style={styles.milestoneDot}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "scale(1.15)";
+                  e.currentTarget.style.boxShadow = "0 0 20px rgba(212, 175, 55, 0.4)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "scale(1)";
+                  e.currentTarget.style.boxShadow = "none";
+                }}
+                aria-hidden="true"
+              >
                 {milestone.year === "Today" ? "Now" : milestone.year.slice(0, 2)}
               </div>
               <div style={styles.milestoneContent}>
@@ -385,11 +328,48 @@ export default function HeritageSection() {
           ))}
         </div>
 
-        <div ref={valuesRef} style={styles.values}>
+        <div ref={valuesRef} className={`${isInView ? 'fade-in-up is-visible animate-delay-1' : 'fade-in-up'}`} style={styles.values}>
           {VALUES.map((value) => (
             <div key={value.label} style={styles.valueCard}>
               <h3 style={styles.valueLabel}>{value.label}</h3>
               <p style={styles.valueDescription}>{value.description}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className={`${isInView ? 'fade-in-up is-visible animate-delay-2' : 'fade-in-up'}`} style={styles.team}>
+          {TEAM.map((member) => (
+            <div key={member.name} style={styles.teamMember}>
+              <div
+                style={styles.teamImageWrapper}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = "scale(1.1)";
+                  e.currentTarget.style.boxShadow = "0 8px 30px rgba(138, 21, 56, 0.3)";
+                  const img = e.currentTarget.querySelector("img");
+                  if (img) img.style.transform = "scale(1.1)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = "scale(1)";
+                  e.currentTarget.style.boxShadow = "none";
+                  const img = e.currentTarget.querySelector("img");
+                  if (img) img.style.transform = "scale(1)";
+                }}
+              >
+                {member.image ? (
+                  <img
+                    src={member.image}
+                    alt={member.name}
+                    style={styles.teamImage}
+                    loading="lazy"
+                  />
+                ) : (
+                  <div style={styles.teamPlaceholder}>
+                    {member.name.split(" ").map(n => n[0]).join("")}
+                  </div>
+                )}
+              </div>
+              <h3 style={styles.teamName}>{member.name}</h3>
+              <p style={styles.teamRole}>{member.role}</p>
             </div>
           ))}
         </div>

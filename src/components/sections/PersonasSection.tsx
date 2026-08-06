@@ -1,8 +1,5 @@
 import { useRef, useEffect } from "react";
-import { gsap } from "../../lib/gsap";
-import { animationRegistry } from "../../lib/animations/registry";
-import { useReducedMotion } from "../../lib/scroll/useReducedMotion";
-import { PERSONAS_ANIM } from "./personasAnimations";
+import { useInView } from "../../lib/animations/useInView";
 
 const PERSONAS_LABEL = "Who We Serve";
 const PERSONAS_HEADLINE = "Every Sip Tells a Story";
@@ -34,117 +31,29 @@ const PERSONAS = [
   },
 ] as const;
 
-type HeaderRefs = {
-  label: HTMLParagraphElement;
-  headline: HTMLHeadingElement;
-  intro: HTMLParagraphElement;
-};
-
-function setInitialState(header: HeaderRefs, cards: HTMLElement[], reduced: boolean) {
-  if (reduced) {
-    gsap.set(header.label, { opacity: 1, y: 0 });
-    gsap.set(header.headline, { opacity: 1, y: 0 });
-    gsap.set(header.intro, { opacity: 1, y: 0 });
-    gsap.set(cards, { opacity: 1, y: 0 });
-    return;
-  }
-
-  const h = PERSONAS_ANIM.header;
-  const c = PERSONAS_ANIM.cards;
-
-  gsap.set(header.label, { opacity: 0, y: h.label.y });
-  gsap.set(header.headline, { opacity: 0, y: h.headline.y });
-  gsap.set(header.intro, { opacity: 0, y: h.intro.y });
-  gsap.set(cards, { opacity: 0, y: c.y });
-}
-
-function buildHeaderTimeline(header: HeaderRefs) {
-  const h = PERSONAS_ANIM.header;
-
-  return gsap.timeline({
-    defaults: { ease: PERSONAS_ANIM.easing.reveal },
-  })
-    .to(header.label, {
-      opacity: 1,
-      y: 0,
-      duration: h.label.duration,
-    })
-    .to(header.headline, {
-      opacity: 1,
-      y: 0,
-      duration: h.headline.duration,
-    }, "<0.1")
-    .to(header.intro, {
-      opacity: 1,
-      y: 0,
-      duration: h.intro.duration,
-    }, "<0.15");
-}
-
-function buildCardsReveal(cards: HTMLElement[], sectionEl: HTMLDivElement) {
-  const c = PERSONAS_ANIM.cards;
-
-  return gsap.timeline({
-    scrollTrigger: {
-      trigger: sectionEl,
-      start: PERSONAS_ANIM.scroll.start,
-      toggleActions: "play none none reverse",
-    },
-  })
-    .to(cards, {
-      opacity: 1,
-      y: 0,
-      duration: c.duration,
-      stagger: c.stagger,
-      ease: PERSONAS_ANIM.easing.reveal,
-    });
-}
-
 export default function PersonasSection() {
+  const { ref: sectionRef, isInView } = useInView();
   const rootRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLParagraphElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const introRef = useRef<HTMLParagraphElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
-  const reducedMotion = useReducedMotion();
 
   useEffect(() => {
     const root = rootRef.current;
-    const label = labelRef.current;
-    const headline = headlineRef.current;
-    const intro = introRef.current;
-    const grid = gridRef.current;
+    if (!root) return;
 
-    if (!root || !label || !headline || !intro || !grid) {
-      return;
-    }
+    // Content is always visible - no GSAP opacity animations
+    // Scroll-based enhancements can be added later
 
-    const cards = Array.from(grid.children) as HTMLElement[];
-    const header: HeaderRefs = { label, headline, intro };
-
-    setInitialState(header, cards, reducedMotion);
-
-    if (reducedMotion) return;
-
-    const ctx = gsap.context(() => {
-      const headerTl = buildHeaderTimeline(header);
-      animationRegistry.register(root, "personas-header", headerTl);
-
-      const cardsTl = buildCardsReveal(cards, root);
-      animationRegistry.register(root, "personas-cards", cardsTl);
-    });
-
-    return () => {
-      animationRegistry.killAll(root);
-      ctx.revert();
-    };
-  }, [reducedMotion]);
+    return () => {};
+  }, []);
 
   return (
-    <div ref={rootRef} className="brand-section brand-section--primary">
+    <div ref={sectionRef} className="brand-section brand-section--primary">
       <div className="section-container">
-        <header ref={headerRef} className="section-header">
+        <header ref={headerRef} className={`section-header ${isInView ? 'fade-in-up is-visible' : 'fade-in-up'}`}>
           <p ref={labelRef} className="section-label">
             {PERSONAS_LABEL}
           </p>
@@ -158,16 +67,18 @@ export default function PersonasSection() {
           </p>
         </header>
 
-        <div ref={gridRef} className="persona-grid">
-          {PERSONAS.map((persona) => (
-            <article
-              key={persona.id}
-              className={`persona-card persona-card--${persona.size}`}
-            >
-              <p className="persona-card__name">{persona.name}</p>
-              <p className="persona-card__quote">&ldquo;{persona.quote}&rdquo;</p>
-            </article>
-          ))}
+        <div ref={gridRef} className={`${isInView ? 'fade-in-up is-visible animate-delay-2' : 'fade-in-up'}`}>
+          <div className="persona-grid">
+            {PERSONAS.map((persona) => (
+              <article
+                key={persona.id}
+                className={`persona-card persona-card--${persona.size}`}
+              >
+                <p className="persona-card__name">{persona.name}</p>
+                <p className="persona-card__quote">&ldquo;{persona.quote}&rdquo;</p>
+              </article>
+            ))}
+          </div>
         </div>
       </div>
     </div>

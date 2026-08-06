@@ -1,22 +1,14 @@
 import { useEffect, useRef } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-import { MARKETING_ANIM } from "./marketingAnimations";
-import { animationRegistry } from "../../lib/animations/registry";
-import { useReducedMotion } from "../../lib/scroll/useReducedMotion";
-
-gsap.registerPlugin(ScrollTrigger);
+import { useInView } from "../../lib/animations/useInView";
 
 export default function MarketingSection() {
+  const { ref: sectionRef, isInView } = useInView();
   const rootRef = useRef<HTMLDivElement>(null);
 
   const labelRef = useRef<HTMLParagraphElement>(null);
   const headlineRef = useRef<HTMLHeadingElement>(null);
   const introRef = useRef<HTMLParagraphElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
-
-  const reducedMotion = useReducedMotion();
 
   const ecosystem = [
     {
@@ -38,70 +30,18 @@ export default function MarketingSection() {
 
   useEffect(() => {
     const root = rootRef.current;
-
     if (!root) return;
 
-    if (reducedMotion) {
-      gsap.set(root.querySelectorAll("*"), {
-        opacity: 1,
-        y: 0,
-      });
-      return;
-    }
+    // Content is always visible - no GSAP opacity animations
+    // Scroll-based enhancements can be added later
 
-    const ctx = gsap.context(() => {
-      const timeline = gsap.timeline({
-        scrollTrigger: {
-          trigger: root,
-          start: MARKETING_ANIM.scroll.start,
-        },
-      });
-
-      timeline
-        .from(labelRef.current, {
-          ...MARKETING_ANIM.header.label,
-          opacity: 0,
-          ease: MARKETING_ANIM.easing.reveal,
-        })
-        .from(headlineRef.current, {
-          ...MARKETING_ANIM.header.headline,
-          opacity: 0,
-          ease: MARKETING_ANIM.easing.reveal,
-        })
-        .from(introRef.current, {
-          ...MARKETING_ANIM.header.intro,
-          opacity: 0,
-          ease: MARKETING_ANIM.easing.reveal,
-        });
-
-      const cards = cardsRef.current?.children;
-
-      if (cards) {
-        gsap.from(cards, {
-          ...MARKETING_ANIM.cards,
-          opacity: 0,
-          stagger: MARKETING_ANIM.cards.stagger,
-          ease: MARKETING_ANIM.easing.reveal,
-          scrollTrigger: {
-            trigger: cardsRef.current,
-            start: MARKETING_ANIM.scroll.start,
-          },
-        });
-      }
-
-      animationRegistry.register(root, "marketing-main", timeline);
-    }, root);
-
-    return () => {
-      ctx.revert();
-      animationRegistry.killAll(root);
-    };
-  }, [reducedMotion]);
+    return () => {};
+  }, []);
 
   return (
-    <div ref={rootRef} className="brand-section brand-section--primary">
+    <div ref={sectionRef} className="brand-section brand-section--primary">
       <div className="section-container">
-        <header className="section-header">
+        <header className={`section-header ${isInView ? 'fade-in-up is-visible' : 'fade-in-up'}`}>
           <p ref={labelRef} className="section-label">Digital Connection</p>
 
           <h2 ref={headlineRef} className="section-title">
@@ -114,21 +54,23 @@ export default function MarketingSection() {
           </p>
         </header>
 
-        <div ref={cardsRef} className="ecosystem">
-          <div className="ecosystem__center" aria-hidden="true">
-            <span className="ecosystem__core">Community</span>
-          </div>
+        <div ref={cardsRef} className={`${isInView ? 'fade-in-up is-visible animate-delay-2' : 'fade-in-up'}`}>
+          <div className="ecosystem">
+            <div className="ecosystem__center" aria-hidden="true">
+              <span className="ecosystem__core">Community</span>
+            </div>
 
-          <div className="ecosystem__channels">
-            {ecosystem.map((item) => (
-              <article key={item.channel} className="ecosystem__channel">
-                <p className="ecosystem__channel-name">{item.channel}</p>
-                <p className="ecosystem__channel-role">{item.role}</p>
-                <p className="ecosystem__channel-description">
-                  {item.description}
-                </p>
-              </article>
-            ))}
+            <div className="ecosystem__channels">
+              {ecosystem.map((item) => (
+                <article key={item.channel} className="ecosystem__channel">
+                  <p className="ecosystem__channel-name">{item.channel}</p>
+                  <p className="ecosystem__channel-role">{item.role}</p>
+                  <p className="ecosystem__channel-description">
+                    {item.description}
+                  </p>
+                </article>
+              ))}
+            </div>
           </div>
         </div>
       </div>
