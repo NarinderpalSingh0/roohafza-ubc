@@ -34,25 +34,6 @@ export default function Footer() {
           </div>
 
           <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))",
-            gap: "0.75rem 2rem",
-            maxWidth: "32rem",
-            width: "100%",
-          }}>
-            {["Narinderpal Singh", "Mannat Arora", "Kashika Bhatia", "Manraj Singh Chandi"].map((name) => (
-              <p key={name} style={{
-                fontFamily: "var(--font-body)",
-                fontSize: "0.875rem",
-                color: "rgba(255, 255, 255, 0.7)",
-                margin: 0,
-              }}>
-                {name}
-              </p>
-            ))}
-          </div>
-
-          <div style={{
             display: "flex",
             gap: "1.5rem",
             alignItems: "center",
