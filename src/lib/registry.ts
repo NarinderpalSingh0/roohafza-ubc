@@ -83,7 +83,7 @@ export const sections: readonly SectionConfig[] = [
   },
   {
     id: SECTION.build,
-    component: lazy(() => import("../components/sections/BuildSection")),
+    component: lazy(() => import("../components/sections/BuildConfigurator")),
     tier: 1,
     hasAnimation: true,
   },

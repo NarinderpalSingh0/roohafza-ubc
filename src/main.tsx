@@ -5,6 +5,7 @@ import './styles/typography.css'
 import './styles/sections.css'
 import './styles/cards.css'
 import './styles/animations.css'
+import './styles/build-configurator.css'
 import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(
