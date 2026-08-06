@@ -11,8 +11,8 @@ export const HERO_ANIM = {
     pinDuration: 1,
     backgroundY: "-20%",
     headlineScale: 0.85,
-    subtitleOpacity: 0,
-    ctaOpacity: 0,
+    subtitleOpacity: 0.3,
+    ctaOpacity: 0.3,
     scrollIndicatorOpacity: 0,
   },
   easing: {

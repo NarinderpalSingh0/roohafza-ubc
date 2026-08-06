@@ -1,8 +1,6 @@
 import { useRef, useEffect } from "react";
 import { gsap } from "../../lib/gsap";
-import { animationRegistry } from "../../lib/animations/registry";
 import { useReducedMotion } from "../../lib/scroll/useReducedMotion";
-import { HERO_ANIM } from "./heroAnimations";
 
 const HERO_HEADLINE = "Rooh Afza";
 const HERO_SUBTITLE = "A Century of Tradition. Reimagined for a New Generation.";
@@ -113,53 +111,6 @@ const styles = {
   },
 } as const;
 
-function buildScrollTimeline(
-  refs: {
-    root: HTMLDivElement;
-    background: HTMLDivElement;
-    headline: HTMLHeadingElement;
-    subtitle: HTMLParagraphElement;
-    cta: HTMLAnchorElement;
-    scrollIndicator: HTMLDivElement;
-  },
-) {
-  const { scroll: s } = HERO_ANIM;
-
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: refs.root,
-      start: "top top",
-      end: "bottom top",
-      scrub: true,
-      pin: true,
-      anticipatePin: 1,
-    },
-  });
-
-  tl.to(refs.background, {
-    y: s.backgroundY,
-    ease: "none",
-  }, 0)
-    .to(refs.headline, {
-      scale: s.headlineScale,
-      ease: "none",
-    }, 0)
-    .to(refs.subtitle, {
-      opacity: s.subtitleOpacity,
-      ease: "none",
-    }, 0)
-    .to(refs.cta, {
-      opacity: s.ctaOpacity,
-      ease: "none",
-    }, 0)
-    .to(refs.scrollIndicator, {
-      opacity: s.scrollIndicatorOpacity,
-      ease: "none",
-    }, 0);
-
-  return tl;
-}
-
 export default function HeroSection() {
   const rootRef = useRef<HTMLDivElement>(null);
   const backgroundRef = useRef<HTMLDivElement>(null);
@@ -183,34 +134,24 @@ export default function HeroSection() {
       return;
     }
 
-    const refs = { root, background, brandMark, headline, subtitle, cta, scrollIndicator };
-
     if (reducedMotion) {
-      gsap.set(refs.background, { opacity: 1 });
-      gsap.set(refs.brandMark, { opacity: 1, y: 0 });
-      gsap.set(refs.headline, { opacity: 1, y: 0 });
-      gsap.set(refs.subtitle, { opacity: 1, y: 0 });
-      gsap.set(refs.cta, { opacity: 1, scale: 1 });
-      gsap.set(refs.scrollIndicator, { opacity: 1 });
       return;
     }
 
-    gsap.set(refs.background, { opacity: 1 });
-    gsap.set(refs.brandMark, { opacity: 1, y: 0 });
-    gsap.set(refs.headline, { opacity: 1, y: 0 });
-    gsap.set(refs.subtitle, { opacity: 1, y: 0 });
-    gsap.set(refs.cta, { opacity: 1, scale: 1 });
-    gsap.set(refs.scrollIndicator, { opacity: 1 });
-
     const ctx = gsap.context(() => {
-      const scrollTl = buildScrollTimeline(refs);
-      animationRegistry.register(root, "hero-scroll", scrollTl);
+      gsap.to(background, {
+        y: "-15%",
+        ease: "none",
+        scrollTrigger: {
+          trigger: root,
+          start: "top top",
+          end: "bottom top",
+          scrub: true,
+        },
+      });
     });
 
-    return () => {
-      animationRegistry.killAll(root);
-      ctx.revert();
-    };
+    return () => ctx.revert();
   }, [reducedMotion]);
 
   const handleCtaClick = () => {
