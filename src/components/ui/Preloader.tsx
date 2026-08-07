@@ -9,14 +9,15 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
       onComplete: () => onComplete(),
     });
 
-    tl.to({}, { duration: 0.8 })
+    tl.to({}, { duration: 1.2 })
       .call(() => setPhase(1))
-      .to({}, { duration: 0.8 })
+      .to({}, { duration: 1.0 })
       .call(() => setPhase(2))
-      .to({}, { duration: 0.6 })
+      .to({}, { duration: 0.8 })
       .call(() => setPhase(3))
-      .to({}, { duration: 0.5 })
-      .call(() => setPhase(4));
+      .to({}, { duration: 0.8 })
+      .call(() => setPhase(4))
+      .to({}, { duration: 1.0 });
 
     return () => { tl.kill(); };
   }, [onComplete]);
