@@ -4,7 +4,7 @@ class AmbientEngine {
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
   private isPlaying = false;
-  private intervals: ReturnType<typeof setInterval>[] = [];
+  private timers: ReturnType<typeof setTimeout>[] = [];
 
   async start() {
     if (this.isPlaying) return;
@@ -13,119 +13,226 @@ class AmbientEngine {
     this.masterGain.gain.value = 0;
     this.masterGain.connect(this.ctx.destination);
 
-    // Tanpura drone — two detuned oscillators
-    const drone1 = this.ctx.createOscillator();
-    const drone2 = this.ctx.createOscillator();
-    const droneGain = this.ctx.createGain();
-    drone1.type = "sine";
-    drone1.frequency.value = 130.81; // C3
-    drone2.type = "sine";
-    drone2.frequency.value = 196.00; // G3
-    droneGain.gain.value = 0.06;
-    drone1.connect(droneGain);
-    drone2.connect(droneGain);
-    droneGain.connect(this.masterGain);
-    drone1.start();
-    drone2.start();
+    // Tanpura drone — warm pad with harmonics
+    this.playDrone();
 
-    // Soft shimmer — high sine
-    const shimmer = this.ctx.createOscillator();
-    const shimmerGain = this.ctx.createGain();
-    shimmer.type = "sine";
-    shimmer.frequency.value = 523.25; // C5
-    shimmerGain.gain.value = 0.015;
-    shimmer.connect(shimmerGain);
-    shimmerGain.connect(this.masterGain);
-    shimmer.start();
+    // Soft breeze — brown noise (smoother than white)
+    this.playBreeze();
 
-    // Wind — filtered noise
-    const windBuffer = this.createNoiseBuffer(2);
-    const wind = this.ctx.createBufferSource();
-    wind.buffer = windBuffer;
-    wind.loop = true;
-    const windFilter = this.ctx.createBiquadFilter();
-    windFilter.type = "lowpass";
-    windFilter.frequency.value = 400;
-    windFilter.Q.value = 0.5;
-    const windGain = this.ctx.createGain();
-    windGain.gain.value = 0.04;
-    wind.connect(windFilter);
-    windFilter.connect(windGain);
-    windGain.connect(this.masterGain);
-    wind.start();
+    // Water fountain — gentle bubbling
+    this.playFountain();
 
-    // Modulate wind
-    const windLfo = this.ctx.createOscillator();
-    const windLfoGain = this.ctx.createGain();
-    windLfo.frequency.value = 0.1;
-    windLfoGain.gain.value = 150;
-    windLfo.connect(windLfoGain);
-    windLfoGain.connect(windFilter.frequency);
-    windLfo.start();
+    // Bird chirps — occasional
+    this.scheduleBirds();
 
-    // Water drops — periodic
-    this.startWaterDrops();
+    // Chime — every 25s
+    this.scheduleChime();
 
     // Fade in
-    this.masterGain.gain.linearRampToValueAtTime(0.15, this.ctx.currentTime + 3);
+    this.masterGain.gain.linearRampToValueAtTime(0.18, this.ctx.currentTime + 4);
     this.isPlaying = true;
   }
 
-  private createNoiseBuffer(seconds: number): AudioBuffer {
-    const sampleRate = this.ctx!.sampleRate;
-    const length = sampleRate * seconds;
-    const buffer = this.ctx!.createBuffer(1, length, sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < length; i++) {
-      data[i] = Math.random() * 2 - 1;
-    }
-    return buffer;
+  private playDrone() {
+    if (!this.ctx || !this.masterGain) return;
+
+    const notes = [130.81, 196.00, 261.63]; // C3, G3, C4
+    const droneGain = this.ctx.createGain();
+    droneGain.gain.value = 0.04;
+    droneGain.connect(this.masterGain);
+
+    notes.forEach((freq, i) => {
+      const osc = this.ctx!.createOscillator();
+      const oscGain = this.ctx!.createGain();
+      osc.type = "sine";
+      osc.frequency.value = freq;
+      oscGain.gain.value = 0.025 - i * 0.005;
+      osc.connect(oscGain);
+      oscGain.connect(droneGain);
+      osc.start();
+
+      // Slow vibrato
+      const lfo = this.ctx!.createOscillator();
+      const lfoGain = this.ctx!.createGain();
+      lfo.frequency.value = 0.3 + i * 0.1;
+      lfoGain.gain.value = 0.5;
+      lfo.connect(lfoGain);
+      lfoGain.connect(osc.frequency);
+      lfo.start();
+    });
   }
 
-  private startWaterDrops() {
-    const createDrop = () => {
+  private playBreeze() {
+    if (!this.ctx || !this.masterGain) return;
+
+    // Brown noise — much smoother than white noise
+    const bufferSize = 2 * this.ctx.sampleRate;
+    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    let lastOut = 0;
+    for (let i = 0; i < bufferSize; i++) {
+      const white = Math.random() * 2 - 1;
+      data[i] = (lastOut + 0.02 * white) / 1.02;
+      lastOut = data[i];
+      data[i] *= 3.5;
+    }
+
+    const source = this.ctx.createBufferSource();
+    source.buffer = buffer;
+    source.loop = true;
+
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.frequency.value = 300;
+    filter.Q.value = 0.3;
+
+    const gain = this.ctx.createGain();
+    gain.gain.value = 0.03;
+
+    source.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.masterGain);
+    source.start();
+
+    // Gentle modulation
+    const lfo = this.ctx.createOscillator();
+    const lfoGain = this.ctx.createGain();
+    lfo.frequency.value = 0.08;
+    lfoGain.gain.value = 80;
+    lfo.connect(lfoGain);
+    lfoGain.connect(filter.frequency);
+    lfo.start();
+  }
+
+  private playFountain() {
+    if (!this.ctx || !this.masterGain) return;
+
+    const createBubble = () => {
       if (!this.ctx || !this.masterGain) return;
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       const filter = this.ctx.createBiquadFilter();
 
       osc.type = "sine";
-      osc.frequency.value = 800 + Math.random() * 1200;
-      filter.type = "bandpass";
-      filter.frequency.value = 1000;
-      filter.Q.value = 5;
+      const baseFreq = 400 + Math.random() * 600;
+      osc.frequency.setValueAtTime(baseFreq, this.ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.5, this.ctx.currentTime + 0.2);
 
-      gain.gain.setValueAtTime(0.03, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.15);
+      filter.type = "bandpass";
+      filter.frequency.value = 600;
+      filter.Q.value = 2;
+
+      gain.gain.setValueAtTime(0.015, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.2);
 
       osc.connect(filter);
       filter.connect(gain);
       gain.connect(this.masterGain!);
       osc.start();
-      osc.stop(this.ctx.currentTime + 0.15);
+      osc.stop(this.ctx.currentTime + 0.25);
     };
 
-    const interval = setInterval(() => {
-      if (Math.random() > 0.4) createDrop();
-    }, 2000 + Math.random() * 3000);
-    this.intervals.push(interval);
+    const scheduleNext = () => {
+      const delay = 1500 + Math.random() * 3000;
+      const timer = setTimeout(() => {
+        createBubble();
+        scheduleNext();
+      }, delay);
+      this.timers.push(timer);
+    };
+    scheduleNext();
 
-    const interval2 = setInterval(() => {
-      if (Math.random() > 0.6) createDrop();
-    }, 4000 + Math.random() * 4000);
-    this.intervals.push(interval2);
+    // Second layer — softer continuous trickle
+    const scheduleTrickle = () => {
+      const delay = 800 + Math.random() * 1500;
+      const timer = setTimeout(() => {
+        if (!this.ctx || !this.masterGain) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.value = 1200 + Math.random() * 400;
+        gain.gain.setValueAtTime(0.006, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.08);
+        osc.connect(gain);
+        gain.connect(this.masterGain!);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.1);
+        scheduleTrickle();
+      }, delay);
+      this.timers.push(timer);
+    };
+    scheduleTrickle();
+  }
+
+  private scheduleBirds() {
+    const createChirp = () => {
+      if (!this.ctx || !this.masterGain) return;
+      const baseFreq = 2000 + Math.random() * 1500;
+      const chirps = 2 + Math.floor(Math.random() * 3);
+
+      for (let i = 0; i < chirps; i++) {
+        const timer = setTimeout(() => {
+          if (!this.ctx || !this.masterGain) return;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(baseFreq, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.2, this.ctx.currentTime + 0.05);
+          osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.9, this.ctx.currentTime + 0.1);
+          gain.gain.setValueAtTime(0.008, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.12);
+          osc.connect(gain);
+          gain.connect(this.masterGain!);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.15);
+        }, i * 120);
+        this.timers.push(timer);
+      }
+
+      const nextTimer = setTimeout(createChirp, 8000 + Math.random() * 15000);
+      this.timers.push(nextTimer);
+    };
+
+    const startTimer = setTimeout(createChirp, 3000 + Math.random() * 5000);
+    this.timers.push(startTimer);
+  }
+
+  private scheduleChime() {
+    const createChime = () => {
+      if (!this.ctx || !this.masterGain) return;
+      const freqs = [1046.5, 1318.5, 1568]; // C6, E6, G6
+      const freq = freqs[Math.floor(Math.random() * freqs.length)];
+
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0.012, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 1.5);
+      osc.connect(gain);
+      gain.connect(this.masterGain!);
+      osc.start();
+      osc.stop(this.ctx.currentTime + 1.8);
+
+      const nextTimer = setTimeout(createChime, 20000 + Math.random() * 15000);
+      this.timers.push(nextTimer);
+    };
+
+    const startTimer = setTimeout(createChime, 5000);
+    this.timers.push(startTimer);
   }
 
   stop() {
     if (!this.isPlaying || !this.ctx || !this.masterGain) return;
     this.masterGain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 2);
+    const ctx = this.ctx;
     setTimeout(() => {
-      this.ctx?.close();
-      this.ctx = null;
-      this.masterGain = null;
+      ctx.close();
     }, 2500);
-    this.intervals.forEach(clearInterval);
-    this.intervals = [];
+    this.timers.forEach(clearTimeout);
+    this.timers = [];
+    this.ctx = null;
+    this.masterGain = null;
     this.isPlaying = false;
   }
 
