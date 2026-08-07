@@ -1,5 +1,8 @@
 import { useState, useRef, useCallback, useEffect, forwardRef, useImperativeHandle } from "react";
 
+const isMobile = () => window.innerWidth < 768;
+const MUTE_KEY = "rooh-afza-muted";
+
 class AmbientEngine {
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
@@ -14,74 +17,86 @@ class AmbientEngine {
     this.masterGain.gain.value = 0;
     this.masterGain.connect(this.ctx.destination);
 
-    // Master compressor for smooth output
     const compressor = this.ctx.createDynamicsCompressor();
-    compressor.threshold.value = -20;
-    compressor.ratio.value = 4;
+    compressor.threshold.value = -24;
+    compressor.ratio.value = 3;
     compressor.connect(this.masterGain);
 
     this.playTanpura(compressor);
-    this.playBreeze(compressor);
+    this.playWind(compressor);
     this.playFountain(compressor);
-    this.scheduleBirds(compressor);
-    this.scheduleChime(compressor);
 
-    // Slow fade in
-    this.masterGain.gain.linearRampToValueAtTime(0.2, this.ctx.currentTime + 5);
+    if (!isMobile()) {
+      this.scheduleBirds(compressor);
+      this.scheduleChime(compressor);
+    }
+
+    // Fade in over 2.5s
+    this.masterGain.gain.linearRampToValueAtTime(0.18, this.ctx.currentTime + 2.5);
     this.isPlaying = true;
   }
 
-  // Rich tanpura drone with harmonics
+  // Warm tanpura: triangle (70%) + sawtooth (30%), slow filter LFO
   private playTanpura(dest: AudioNode) {
     if (!this.ctx) return;
 
     const createString = (fundamental: number, detune: number) => {
       if (!this.ctx) return;
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      const filter = this.ctx.createBiquadFilter();
 
-      osc.type = "sawtooth";
-      osc.frequency.value = fundamental;
-      osc.detune.value = detune;
+      // Triangle (70%)
+      const tri = this.ctx.createOscillator();
+      tri.type = "triangle";
+      tri.frequency.value = fundamental;
+      tri.detune.value = detune;
 
-      // Warm filter
+      // Sawtooth (30%)
+      const saw = this.ctx.createOscillator();
+      saw.type = "sawtooth";
+      saw.frequency.value = fundamental;
+      saw.detune.value = detune;
+
+      const triGain = this.ctx!.createGain();
+      triGain.gain.value = 0.018;
+      const sawGain = this.ctx!.createGain();
+      sawGain.gain.value = 0.006;
+
+      // Warm filter with slow LFO
+      const filter = this.ctx!.createBiquadFilter();
       filter.type = "lowpass";
-      filter.frequency.value = 800;
-      filter.Q.value = 0.7;
+      filter.frequency.value = 600;
+      filter.Q.value = 0.5;
 
-      gain.gain.value = 0.012;
+      const lfo = this.ctx!.createOscillator();
+      const lfoGain = this.ctx!.createGain();
+      lfo.frequency.value = 0.07; // Very slow
+      lfoGain.gain.value = 100;
+      lfo.connect(lfoGain);
+      lfoGain.connect(filter.frequency);
+      lfo.start();
 
-      osc.connect(filter);
-      filter.connect(gain);
-      gain.connect(dest);
-      osc.start();
-      this.oscillators.push(osc);
-
-      // Jwari shimmer — slow amplitude modulation
-      const jwari = this.ctx.createOscillator();
-      const jwariGain = this.ctx.createGain();
-      jwari.frequency.value = 0.15 + Math.random() * 0.1;
-      jwariGain.gain.value = 0.003;
-      jwari.connect(jwariGain);
-      jwariGain.connect(gain.gain);
-      jwari.start();
-      this.oscillators.push(jwari);
+      tri.connect(triGain);
+      saw.connect(sawGain);
+      triGain.connect(filter);
+      sawGain.connect(filter);
+      filter.connect(dest);
+      tri.start();
+      saw.start();
+      this.oscillators.push(tri, saw, lfo);
     };
 
-    // Sa-Pa-Sa (C3-G3-C4) with slight detuning for warmth
-    createString(130.81, -3);
-    createString(130.81, 3);
-    createString(196.00, -2);
-    createString(261.63, 0);
+    // Sa-Pa-Sa with slight detuning
+    createString(130.81, -2);
+    createString(130.81, 2);
+    createString(196.00, -1);
+    createString(261.63, 1);
   }
 
-  // Soft wind — layered brown noise
-  private playBreeze(dest: AudioNode) {
+  // Stereo-wide wind
+  private playWind(dest: AudioNode) {
     if (!this.ctx) return;
 
     const createBrownNoise = () => {
-      if (!this.ctx) return { buffer: null as AudioBuffer | null, source: null as AudioBufferSourceNode | null };
+      if (!this.ctx) return null;
       const bufferSize = 4 * this.ctx.sampleRate;
       const buffer = this.ctx.createBuffer(2, bufferSize, this.ctx.sampleRate);
 
@@ -96,73 +111,83 @@ class AmbientEngine {
         }
       }
 
-      const source = this.ctx.createBufferSource();
+      const source = this.ctx!.createBufferSource();
       source.buffer = buffer;
       source.loop = true;
-      return { buffer, source };
+      return source;
     };
 
-    // Layer 1 — deep rumble
-    const { source: s1 } = createBrownNoise();
+    // Deep rumble — center
+    const s1 = createBrownNoise();
     if (s1) {
       const f1 = this.ctx.createBiquadFilter();
       f1.type = "lowpass";
-      f1.frequency.value = 200;
+      f1.frequency.value = 180;
       const g1 = this.ctx.createGain();
-      g1.gain.value = 0.025;
+      g1.gain.value = 0.02;
       s1.connect(f1);
       f1.connect(g1);
       g1.connect(dest);
       s1.start();
     }
 
-    // Layer 2 — mid breeze
-    const { source: s2 } = createBrownNoise();
+    // Mid breeze — stereo wide using stereo panner
+    const s2 = createBrownNoise();
     if (s2) {
       const f2 = this.ctx.createBiquadFilter();
       f2.type = "bandpass";
-      f2.frequency.value = 400;
-      f2.Q.value = 0.4;
-      const g2 = this.ctx.createGain();
-      g2.gain.value = 0.015;
+      f2.frequency.value = 350;
+      f2.Q.value = 0.3;
 
       // Slow sweep
       const lfo = this.ctx.createOscillator();
       const lfoG = this.ctx.createGain();
-      lfo.frequency.value = 0.06;
-      lfoG.gain.value = 150;
+      lfo.frequency.value = 0.05;
+      lfoG.gain.value = 120;
       lfo.connect(lfoG);
       lfoG.connect(f2.frequency);
       lfo.start();
 
+      // Split to stereo
+      const splitter = this.ctx.createChannelSplitter(2);
+      const merger = this.ctx.createChannelMerger(2);
+      const leftGain = this.ctx.createGain();
+      const rightGain = this.ctx.createGain();
+      leftGain.gain.value = 0.7;
+      rightGain.gain.value = 0.7;
+
       s2.connect(f2);
-      f2.connect(g2);
-      g2.connect(dest);
+      f2.connect(splitter);
+      splitter.connect(leftGain, 0);
+      splitter.connect(rightGain, 1);
+      leftGain.connect(merger, 0, 0);
+      rightGain.connect(merger, 0, 1);
+      merger.connect(dest);
       s2.start();
+      this.oscillators.push(lfo);
     }
   }
 
-  // Fountain — gentle water sounds
+  // Centered fountain
   private playFountain(dest: AudioNode) {
     if (!this.ctx) return;
 
-    // Continuous trickle
     const trickle = () => {
       if (!this.ctx) return;
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.type = "sine";
-      osc.frequency.value = 1800 + Math.random() * 800;
-      gain.gain.setValueAtTime(0.004, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.06);
+      osc.frequency.value = 1600 + Math.random() * 600;
+      gain.gain.setValueAtTime(0.003, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
       osc.connect(gain);
       gain.connect(dest);
       osc.start();
-      osc.stop(this.ctx.currentTime + 0.08);
+      osc.stop(this.ctx.currentTime + 0.07);
     };
 
     const scheduleTrickle = () => {
-      const delay = 400 + Math.random() * 800;
+      const delay = 500 + Math.random() * 1000;
       const timer = setTimeout(() => {
         trickle();
         scheduleTrickle();
@@ -171,25 +196,23 @@ class AmbientEngine {
     };
     scheduleTrickle();
 
-    // Occasional plop
     const plop = () => {
       if (!this.ctx) return;
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
-      osc.type = "sine";
-      const freq = 300 + Math.random() * 400;
+      const freq = 250 + Math.random() * 350;
       osc.frequency.setValueAtTime(freq * 2, this.ctx.currentTime);
       osc.frequency.exponentialRampToValueAtTime(freq, this.ctx.currentTime + 0.08);
-      gain.gain.setValueAtTime(0.02, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.015, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.12);
       osc.connect(gain);
       gain.connect(dest);
       osc.start();
-      osc.stop(this.ctx.currentTime + 0.2);
+      osc.stop(this.ctx.currentTime + 0.15);
     };
 
     const schedulePlop = () => {
-      const delay = 2000 + Math.random() * 5000;
+      const delay = 3000 + Math.random() * 6000;
       const timer = setTimeout(() => {
         plop();
         schedulePlop();
@@ -199,12 +222,17 @@ class AmbientEngine {
     schedulePlop();
   }
 
-  // Bird chirps — natural patterns
+  // Birds with random panning, 20-40s interval
   private scheduleBirds(dest: AudioNode) {
     const createBirdPhrase = () => {
       if (!this.ctx) return;
       const baseFreq = 2200 + Math.random() * 1200;
       const pattern = Math.floor(Math.random() * 3);
+
+      // Random pan ±25%
+      const pan = (Math.random() * 0.5 - 0.25);
+      const panner = this.ctx.createStereoPanner();
+      panner.pan.value = pan;
 
       const chirp = (freq: number, delay: number, duration: number) => {
         const timer = setTimeout(() => {
@@ -213,13 +241,13 @@ class AmbientEngine {
           const gain = this.ctx.createGain();
           osc.type = "sine";
           osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(freq * 1.15, this.ctx.currentTime + duration * 0.5);
+          osc.frequency.exponentialRampToValueAtTime(freq * 1.12, this.ctx.currentTime + duration * 0.5);
           osc.frequency.exponentialRampToValueAtTime(freq * 0.95, this.ctx.currentTime + duration);
-          gain.gain.setValueAtTime(0.006, this.ctx.currentTime);
-          gain.gain.linearRampToValueAtTime(0.008, this.ctx.currentTime + duration * 0.3);
+          gain.gain.setValueAtTime(0.005, this.ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.006, this.ctx.currentTime + duration * 0.3);
           gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
           osc.connect(gain);
-          gain.connect(dest);
+          gain.connect(panner);
           osc.start();
           osc.stop(this.ctx.currentTime + duration + 0.05);
         }, delay);
@@ -227,62 +255,64 @@ class AmbientEngine {
       };
 
       if (pattern === 0) {
-        // Simple two-note
         chirp(baseFreq, 0, 0.1);
-        chirp(baseFreq * 1.1, 150, 0.1);
+        chirp(baseFreq * 1.08, 140, 0.1);
       } else if (pattern === 1) {
-        // Three-note ascending
         chirp(baseFreq, 0, 0.08);
-        chirp(baseFreq * 1.08, 120, 0.08);
-        chirp(baseFreq * 1.15, 240, 0.1);
+        chirp(baseFreq * 1.06, 110, 0.08);
+        chirp(baseFreq * 1.12, 220, 0.09);
       } else {
-        // Quick trill
-        for (let i = 0; i < 4; i++) {
-          chirp(baseFreq + (i % 2) * 100, i * 80, 0.06);
+        for (let i = 0; i < 3; i++) {
+          chirp(baseFreq + (i % 2) * 80, i * 75, 0.05);
         }
       }
 
-      const nextTimer = setTimeout(createBirdPhrase, 10000 + Math.random() * 20000);
+      panner.connect(dest);
+
+      // 20-40 seconds between phrases
+      const nextTimer = setTimeout(createBirdPhrase, 20000 + Math.random() * 20000);
       this.timers.push(nextTimer);
     };
 
-    const startTimer = setTimeout(createBirdPhrase, 4000 + Math.random() * 6000);
+    const startTimer = setTimeout(createBirdPhrase, 5000 + Math.random() * 5000);
     this.timers.push(startTimer);
   }
 
-  // Soft bell chime
+  // Bell chime — centered, 60-90s interval
   private scheduleChime(dest: AudioNode) {
     const chime = () => {
       if (!this.ctx) return;
-      const freqs = [1046.5, 1318.5, 1568, 2093]; // C6, E6, G6, C7
+      const freqs = [1046.5, 1318.5, 1568];
       const freq = freqs[Math.floor(Math.random() * freqs.length)];
 
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.type = "sine";
       osc.frequency.value = freq;
-      gain.gain.setValueAtTime(0.008, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 2);
+      gain.gain.setValueAtTime(0.006, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 2.5);
       osc.connect(gain);
       gain.connect(dest);
       osc.start();
-      osc.stop(this.ctx.currentTime + 2.5);
+      osc.stop(this.ctx.currentTime + 3);
 
-      const nextTimer = setTimeout(chime, 25000 + Math.random() * 20000);
+      // 60-90 seconds between chimes
+      const nextTimer = setTimeout(chime, 60000 + Math.random() * 30000);
       this.timers.push(nextTimer);
     };
 
-    const startTimer = setTimeout(chime, 8000);
+    const startTimer = setTimeout(chime, 12000);
     this.timers.push(startTimer);
   }
 
+  // Smooth fade out over 0.8s
   stop() {
     if (!this.isPlaying || !this.ctx || !this.masterGain) return;
-    this.masterGain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 3);
-    this.oscillators.forEach(o => { try { o.stop(); } catch { /* already stopped */ } });
+    this.masterGain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.8);
+    this.oscillators.forEach(o => { try { o.stop(this.ctx!.currentTime + 1); } catch { /* already stopped */ } });
     this.oscillators = [];
     const ctx = this.ctx;
-    setTimeout(() => { ctx.close(); }, 3500);
+    setTimeout(() => { ctx.close(); }, 1200);
     this.timers.forEach(clearTimeout);
     this.timers = [];
     this.ctx = null;
@@ -302,11 +332,16 @@ class AmbientEngine {
 
 const AmbientSound = forwardRef<{ start: () => void }, { autoStart?: boolean }>(
   function AmbientSound({ autoStart = true }, ref) {
-    const [isPlaying, setIsPlaying] = useState(false);
+    const [isPlaying, setIsPlaying] = useState(() => {
+      const muted = localStorage.getItem(MUTE_KEY);
+      return muted !== "true";
+    });
     const engineRef = useRef<AmbientEngine | null>(null);
 
     useImperativeHandle(ref, () => ({
       start: () => {
+        const muted = localStorage.getItem(MUTE_KEY);
+        if (muted === "true") return;
         if (!engineRef.current) {
           engineRef.current = new AmbientEngine();
         }
@@ -317,18 +352,36 @@ const AmbientSound = forwardRef<{ start: () => void }, { autoStart?: boolean }>(
 
     useEffect(() => {
       if (autoStart && !engineRef.current) {
-        engineRef.current = new AmbientEngine();
-        engineRef.current.start();
-        setIsPlaying(true);
+        const muted = localStorage.getItem(MUTE_KEY);
+        if (muted !== "true") {
+          engineRef.current = new AmbientEngine();
+          engineRef.current.start();
+          setIsPlaying(true);
+        }
       }
     }, [autoStart]);
+
+    // Resume after tab switch
+    useEffect(() => {
+      const handleVisibility = () => {
+        if (document.visibilityState === "visible" && isPlaying && engineRef.current && !engineRef.current["isPlaying"]) {
+          engineRef.current.start();
+        }
+      };
+      document.addEventListener("visibilitychange", handleVisibility);
+      return () => document.removeEventListener("visibilitychange", handleVisibility);
+    }, [isPlaying]);
 
     const toggle = useCallback(() => {
       if (!engineRef.current) {
         engineRef.current = new AmbientEngine();
       }
       engineRef.current.toggle();
-      setIsPlaying(prev => !prev);
+      setIsPlaying(prev => {
+        const next = !prev;
+        localStorage.setItem(MUTE_KEY, String(!next));
+        return next;
+      });
     }, []);
 
     useEffect(() => {
