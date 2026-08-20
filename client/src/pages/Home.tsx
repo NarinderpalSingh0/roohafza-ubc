@@ -1,31 +1,35 @@
 /**
- * Kinetic Refreshment design reminder:
- * Campaign-placcard composition, Spark Crimson fields, cream editorial type,
- * fluid ribbons, and deliberate asymmetric spacing—never generic app UI.
+ * Roohafza design reminder:
+ * Rose-pink poster fields, Urdu/Hindi-adjacent expressive typography, supplied cans
+ * treated as the hero objects, and bright citrus-green highlights. Keep the energy
+ * celebratory and original—never generic beverage catalogue UI.
  */
-import { ArrowDownRight, ArrowUpRight, Menu, Plus, Sparkles, X } from "lucide-react";
-import { useState } from "react";
+import { ArrowDownRight, ArrowUpRight, Check, Menu, MoveUpRight, Sparkles, X } from "lucide-react";
+import { CSSProperties, FormEvent, useState } from "react";
+import { trpc } from "@/lib/trpc";
+import { StoreLocator } from "@/components/StoreLocator";
 
-const navItems = ["Flavours", "The ritual", "Our craft"];
-
-const flavours = [
+const products = [
   {
-    name: "Ruby Red",
-    note: "Cherry + cola spice",
-    color: "ruby",
-    detail: "Deep, dark, dancing.",
+    name: "Berry Bust",
+    subline: "A lively berry break",
+    note: "Pink, playful, bright.",
+    image: "/manus-storage/roohafza-berry-bust_52910888.png",
+    className: "berry",
   },
   {
-    name: "Lime Lift",
-    note: "Lime + bright fizz",
-    color: "lime",
-    detail: "A vivid little reset.",
+    name: "Na Chalan",
+    subline: "A strawberry-forward sip",
+    note: "Big warmth, sharp mood.",
+    image: "/manus-storage/roohafza-no-chalan_ef606d6d.png",
+    className: "red",
   },
   {
-    name: "Citrus Bloom",
-    note: "Grapefruit + orange",
-    color: "citrus",
-    detail: "Tart, sunlit, sharp.",
+    name: "Naam Rakh Lena",
+    subline: "A rose-coloured moment",
+    note: "Soft, fragrant, memorable.",
+    image: "/manus-storage/roohafza-nam-rakh-lena_8d4ce84b.png",
+    className: "cream",
   },
 ];
 
@@ -33,170 +37,123 @@ function scrollToId(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-export default function Home() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [parallax, setParallax] = useState({ x: 0, y: 0 });
-
-  const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (event.pointerType !== "mouse") return;
-    const bounds = event.currentTarget.getBoundingClientRect();
-    const x = ((event.clientX - bounds.left) / bounds.width - 0.5) * 8;
-    const y = ((event.clientY - bounds.top) / bounds.height - 0.5) * 6;
-    setParallax({ x, y });
-  };
+function ProductCard({ product, index }: { product: (typeof products)[number]; index: number }) {
+  const [tilt, setTilt] = useState({ x: 0, y: 0, glowX: 50, glowY: 50 });
+  const tiltStyle = {
+    "--rotate-x": `${tilt.x}deg`,
+    "--rotate-y": `${tilt.y}deg`,
+    "--glow-x": `${tilt.glowX}%`,
+    "--glow-y": `${tilt.glowY}%`,
+  } as CSSProperties;
 
   return (
-    <div className="site-shell">
-      <header className="topbar">
-        <a className="brand" href="#top" aria-label="Crimson Spark home">
-          <img src="/manus-storage/crimson-spark-mark_7ea00629.png" alt="" />
-          <span>Crimson<br />Spark</span>
-        </a>
+    <article
+      className={`product-card ${product.className}`}
+      style={tiltStyle}
+      onPointerMove={(event) => {
+        if (event.pointerType !== "mouse") return;
+        const bounds = event.currentTarget.getBoundingClientRect();
+        const x = (event.clientX - bounds.left) / bounds.width - 0.5;
+        const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+        setTilt({ x: -y * 7, y: x * 8, glowX: (x + 0.5) * 100, glowY: (y + 0.5) * 100 });
+      }}
+      onPointerLeave={() => setTilt({ x: 0, y: 0, glowX: 50, glowY: 50 })}
+    >
+      <div className="card-halo" />
+      <div className="product-card-top"><span>0{index + 1}</span><span>Roohafza cans</span></div>
+      <img className="can-render" src={product.image} alt={`${product.name} Roohafza can`} />
+      <div className="product-card-copy">
+        <span>{product.subline}</span>
+        <h3>{product.name}</h3>
+        <p>{product.note}</p>
+        <div className="tilt-hint">Move to tilt <MoveUpRight size={14} /></div>
+      </div>
+    </article>
+  );
+}
 
-        <nav className="desktop-nav" aria-label="Primary navigation">
-          {navItems.map((item) => (
-            <button key={item} onClick={() => scrollToId(item === "Flavours" ? "flavours" : item === "The ritual" ? "ritual" : "craft")}>
-              {item}
-            </button>
-          ))}
+export default function Home() {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [subscribed, setSubscribed] = useState(false);
+  const [heroShift, setHeroShift] = useState({ x: 0, y: 0 });
+  const newsletter = trpc.newsletter.subscribe.useMutation({
+    onSuccess: () => {
+      setSubscribed(true);
+      setEmail("");
+    },
+  });
+
+  const handleNewsletter = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubscribed(false);
+    newsletter.mutate({ email });
+  };
+
+  const navItems = [
+    ["The cans", "cans"],
+    ["Find us", "stores"],
+    ["Seasonal drops", "newsletter"],
+  ] as const;
+
+  return (
+    <div className="rooh-site">
+      <header className="rooh-nav">
+        <a className="rooh-logo" href="#top" aria-label="Roohafza home"><img src="/manus-storage/roohafza-wordmark_3d050812.png" alt="Roohafza" /></a>
+        <nav className="rooh-desktop-nav" aria-label="Primary navigation">
+          {navItems.map(([label, id]) => <button key={id} onClick={() => scrollToId(id)}>{label}</button>)}
         </nav>
-
-        <button className="nav-cta" onClick={() => scrollToId("flavours")}>
-          <span>Find your fizz</span>
-          <ArrowUpRight size={16} strokeWidth={2.4} />
-        </button>
-
-        <button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle navigation" aria-expanded={menuOpen}>
-          {menuOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
-
-        {menuOpen && (
-          <nav className="mobile-nav" aria-label="Mobile navigation">
-            {navItems.map((item) => (
-              <button
-                key={item}
-                onClick={() => {
-                  scrollToId(item === "Flavours" ? "flavours" : item === "The ritual" ? "ritual" : "craft");
-                  setMenuOpen(false);
-                }}
-              >
-                {item}<ArrowUpRight size={18} />
-              </button>
-            ))}
-          </nav>
-        )}
+        <button className="rooh-nav-cta" onClick={() => scrollToId("stores")}>Find a can <ArrowUpRight size={16} /></button>
+        <button className="rooh-menu" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-label="Toggle navigation">{menuOpen ? <X size={22} /> : <Menu size={22} />}</button>
+        {menuOpen && <nav className="rooh-mobile-nav" aria-label="Mobile navigation">{navItems.map(([label, id]) => <button key={id} onClick={() => { scrollToId(id); setMenuOpen(false); }}>{label}<ArrowUpRight size={18} /></button>)}</nav>}
       </header>
 
       <main id="top">
-        <section className="hero section-pad" aria-labelledby="hero-title">
-          <div className="hero-copy">
-            <div className="eyebrow"><span className="eyebrow-dot" /> From the first pop</div>
-            <h1 id="hero-title">Make the<br /><em>break</em> brighter.</h1>
-            <p>A crisp, bright sparkling drink built for late lunches, long drives, and the exact moment you need a lift.</p>
-            <div className="hero-actions">
-              <button className="button-light" onClick={() => scrollToId("flavours")}>Pour a spark <ArrowDownRight size={18} /></button>
-              <button className="text-link" onClick={() => scrollToId("ritual")}>How it feels <span>↗</span></button>
-            </div>
-            <div className="hero-meta"><span>01 / 03</span><i /><span>crisp, not complicated</span></div>
+        <section className="rooh-hero section-pad" aria-labelledby="hero-title">
+          <div className="hero-waves" aria-hidden="true"><i /><i /><i /></div>
+          <div className="rooh-hero-copy">
+            <span className="section-kicker light"><i />A feeling in a can</span>
+            <h1 id="hero-title">Dil se<br /><em>cool.</em><br />Dil se yours.</h1>
+            <p>Roohafza shows up when the day needs a little colour, a little kindness, and a cooler point of view.</p>
+            <div className="rooh-hero-actions"><button className="cream-button" onClick={() => scrollToId("cans")}>Meet the cans <ArrowDownRight size={18} /></button><button className="hero-text-button" onClick={() => scrollToId("stores")}>Find nearby <span>↗</span></button></div>
+            <div className="hero-footnote"><span>01 / 03</span><i /><span>More than a drink.</span></div>
           </div>
 
-          <div className="hero-art" onPointerMove={handlePointerMove} onPointerLeave={() => setParallax({ x: 0, y: 0 })}>
-            <div className="hero-orbit orbit-one" />
-            <div className="hero-orbit orbit-two" />
-            <div className="product-frame">
-              <img
-                className="hero-product"
-                src="/manus-storage/crimson-spark-hero_a34aaa4a.jpg"
-                alt="An unbranded crimson sparkling beverage bottle with ice and fizz"
-                style={{ transform: `translate3d(${parallax.x}px, ${parallax.y}px, 0) rotate(${parallax.x * 0.09}deg)` }}
-              />
-              <div className="frame-plaque">
-                <span>Cold, bright, alive</span>
-                <b>RUBY<br />COLA</b>
-              </div>
-            </div>
-            <div className="spark-burst"><Sparkles size={19} /><span>open joy</span></div>
+          <div className="rooh-hero-product" onPointerMove={(event) => {
+            if (event.pointerType !== "mouse") return;
+            const bounds = event.currentTarget.getBoundingClientRect();
+            setHeroShift({ x: ((event.clientX - bounds.left) / bounds.width - 0.5) * 10, y: ((event.clientY - bounds.top) / bounds.height - 0.5) * 8 });
+          }} onPointerLeave={() => setHeroShift({ x: 0, y: 0 })}>
+            <div className="hero-sunburst" />
+            <div className="hero-petal petal-a" /><div className="hero-petal petal-b" /><div className="hero-petal petal-c" />
+            <img src="/manus-storage/roohafza-berry-bust_52910888.png" alt="Roohafza Berry Bust can" style={{ transform: `translate3d(${heroShift.x}px, ${heroShift.y}px, 0) rotate(${heroShift.x * .18}deg)` }} />
+            <div className="hero-sticker"><Sparkles size={17} /><span>Har sip<br />ek feeling</span></div>
+            <div className="hero-product-note"><span>Berry Bust</span><b>WORTH<br />THE<br />MOOD.</b></div>
           </div>
         </section>
 
-        <section className="ribbon" aria-label="Brand statement">
-          <div className="ribbon-track">
-            <span>Never a small moment</span><b>✦</b><span>Never a small moment</span><b>✦</b><span>Never a small moment</span><b>✦</b><span>Never a small moment</span>
-          </div>
+        <section className="rooh-ribbon" aria-label="Roohafza brand statement"><div><span>Meetha. Thanda. Yaadgaar.</span><b>✦</b><span>Meetha. Thanda. Yaadgaar.</span><b>✦</b><span>Meetha. Thanda. Yaadgaar.</span><b>✦</b><span>Meetha. Thanda. Yaadgaar.</span></div></section>
+
+        <section className="can-section section-pad" id="cans" aria-labelledby="cans-title">
+          <div className="can-intro"><div><span className="section-kicker"><i />Pick your poster</span><h2 id="cans-title">Little cans.<br /><em>Large feelings.</em></h2></div><p>Every can arrives with its own mood, colour, and a little story on the side. Follow the one that feels like you.</p></div>
+          <div className="product-grid">{products.map((product, index) => <ProductCard product={product} index={index} key={product.name} />)}</div>
+          <p className="tilt-caption">Hover the cans to catch the light. On touch, the showcase stays composed and easy to browse.</p>
         </section>
 
-        <section className="flavour-section section-pad" id="flavours" aria-labelledby="flavour-title">
-          <div className="section-intro">
-            <div className="eyebrow dark"><span className="eyebrow-dot" /> Choose the mood</div>
-            <h2 id="flavour-title">A little colour<br />for your <em>minute.</em></h2>
-            <p>Three sharply tuned sparkling blends. No complicated rituals, just a flavour that knows where it’s going.</p>
-          </div>
-
-          <div className="flavour-grid">
-            {flavours.map((flavour, index) => (
-              <article className={`flavour-card ${flavour.color}`} key={flavour.name}>
-                <div className="card-topline"><span>0{index + 1}</span><span>330 ML</span></div>
-                {flavour.color === "lime" && <img src="/manus-storage/crimson-spark-lime_c05573a6.jpg" alt="Lime sparkling drink with ice and sliced limes" />}
-                {flavour.color === "citrus" && <img src="/manus-storage/crimson-spark-fizz_47dfc430.jpg" alt="Abstract carbonation bubbles on red" />}
-                {flavour.color === "ruby" && <div className="ruby-soda"><div className="ruby-soda-dot" /><div className="ruby-soda-bubble b-one" /><div className="ruby-soda-bubble b-two" /><div className="ruby-soda-bubble b-three" /><span>CS</span></div>}
-                <div className="card-content">
-                  <span>{flavour.note}</span>
-                  <h3>{flavour.name}</h3>
-                  <p>{flavour.detail}</p>
-                  <button aria-label={`Learn about ${flavour.name}`}><Plus size={19} /></button>
-                </div>
-              </article>
-            ))}
-          </div>
-          <button className="outline-button" onClick={() => scrollToId("ritual")}>Explore the full collection <ArrowUpRight size={17} /></button>
+        <section className="story-section section-pad" id="story" aria-labelledby="story-title">
+          <div className="story-poster"><div className="story-circle" /><img src="/manus-storage/roohafza-no-chalan_ef606d6d.png" alt="Roohafza Na Chalan can" /><span>Too cool<br />to rush.</span></div>
+          <div className="story-copy"><span className="section-kicker"><i />A new kind of familiar</span><h2 id="story-title">The taste of<br /><em>being yourself.</em></h2><p>Roohafza has always known how to colour a moment. These cans bring that familiar warmth into the pace of now—ready when the plan changes, the gang gathers, or the day needs a little lift.</p><div className="story-facts"><span>Bold colour</span><span>Everyday ease</span><span>Designed to share</span></div></div>
         </section>
 
-        <section className="ritual-section section-pad" id="ritual" aria-labelledby="ritual-title">
-          <div className="ritual-image-card">
-            <img src="/manus-storage/crimson-spark-citrus_eaeb96e3.jpg" alt="Ruby sparkling beverage with grapefruit and orange peel" />
-            <div className="image-stamp">Sip<br />slow.</div>
-          </div>
-          <div className="ritual-copy">
-            <div className="eyebrow dark"><span className="eyebrow-dot" /> The everyday ritual</div>
-            <h2 id="ritual-title">Keep a little<br /><em>sunshine</em> on hand.</h2>
-            <p>Some days need a grand plan. Some days need a cool glass, the windows down, and five minutes that belong only to you.</p>
-            <div className="ritual-steps">
-              <div><span>01</span><p>Chill it until the first sip carries a clean snap.</p></div>
-              <div><span>02</span><p>Pour over ice, or take it exactly as it is.</p></div>
-              <div><span>03</span><p>Let the fizz turn the ordinary into a small celebration.</p></div>
-            </div>
-          </div>
-        </section>
+        <StoreLocator />
 
-        <section className="craft-section section-pad" id="craft" aria-labelledby="craft-title">
-          <div className="craft-copy">
-            <div className="eyebrow"><span className="eyebrow-dot" /> Our craft</div>
-            <h2 id="craft-title">Bright taste.<br /><em>Lighter trace.</em></h2>
-            <p>We’re working toward packaging that spends more time in the loop and less time in the world. Because a bright moment should not leave a dull mark.</p>
-            <a className="button-light" href="#footer">See what we’re changing <ArrowDownRight size={18} /></a>
-          </div>
-          <div className="craft-art">
-            <div className="craft-bubble big">100%</div>
-            <div className="craft-bubble small">∞</div>
-            <div className="craft-ribbon" />
-            <p>Designed<br />to circle<br />back.</p>
-          </div>
-        </section>
-
-        <section className="closing section-pad">
-          <div className="closing-visual"><img src="/manus-storage/crimson-spark-fizz_47dfc430.jpg" alt="Carbonation bubbles on a red field" /></div>
-          <div className="closing-copy"><span className="eyebrow dark"><span className="eyebrow-dot" /> Keep it close</span><h2>Catch the<br />first <em>sparkle.</em></h2><a href="#flavours">Find your flavour <ArrowUpRight size={20} /></a></div>
+        <section className="newsletter-section section-pad" id="newsletter" aria-labelledby="newsletter-title">
+          <div className="newsletter-art"><div className="newsletter-flower">✦</div><div className="newsletter-can"><img src="/manus-storage/roohafza-nam-rakh-lena_8d4ce84b.png" alt="Roohafza Naam Rakh Lena can" /></div></div>
+          <div className="newsletter-copy"><span className="section-kicker light"><i />Seasonal drops</span><h2 id="newsletter-title">Be first to<br />catch the <em>feeling.</em></h2><p>New flavours, fresh artwork, and the next little reason to open something bright.</p>{subscribed ? <div className="newsletter-success" role="status"><Check size={18} />You’re on the list. See you at the next drop.</div> : <form className="newsletter-form" onSubmit={handleNewsletter}><label htmlFor="newsletter-email">Your email address</label><div><input id="newsletter-email" type="email" value={email} required onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" /><button type="submit" disabled={newsletter.isPending}>{newsletter.isPending ? "Joining…" : "Keep me posted"}<ArrowUpRight size={17} /></button></div>{newsletter.error && <p className="newsletter-error" role="alert">{newsletter.error.message}</p>}</form>}<small>By joining, you agree to receive Roohafza launch updates. You can unsubscribe anytime.</small></div>
         </section>
       </main>
 
-      <footer id="footer" className="footer">
-        <div className="footer-top">
-          <a className="brand footer-brand" href="#top"><img src="/manus-storage/crimson-spark-mark_7ea00629.png" alt="" /><span>Crimson<br />Spark</span></a>
-          <p>A small bright thing<br />for the middle of your day.</p>
-          <a href="#top" className="back-top">Back to top <ArrowUpRight size={16} /></a>
-        </div>
-        <div className="footer-bottom"><span>© 2026 Crimson Spark</span><span>Made for bright breaks</span><span>India · English</span></div>
-      </footer>
+      <footer className="rooh-footer"><div className="footer-brandline"><a href="#top"><img src="/manus-storage/roohafza-wordmark_3d050812.png" alt="Roohafza" /></a><p>For every mood in between.</p><button onClick={() => scrollToId("top")}>Back to top <ArrowUpRight size={16} /></button></div><div className="footer-bottom"><span>© 2026 Roohafza</span><span>Made for bright breaks</span><span>India · English</span></div></footer>
     </div>
   );
 }
