@@ -12,7 +12,7 @@ describe("Vercel deployment configuration", () => {
     );
 
     expect(config.installCommand).toBe("pnpm install --frozen-lockfile");
-    expect(config.buildCommand).toBe("pnpm build");
+    expect(config.buildCommand).toBe("pnpm build:vercel");
     expect(config.outputDirectory).toBe("dist/public");
     expect(config.rewrites).toEqual([
       {
@@ -22,11 +22,16 @@ describe("Vercel deployment configuration", () => {
     ]);
   });
 
-  it("provides a rewrite-backed API function for the Express+tRPC application", () => {
-    const functionPath = path.join(projectRoot, "api", "index.ts");
+  it("bundles a rewrite-backed API function for the Express+tRPC application", () => {
+    const packageJson = JSON.parse(
+      fs.readFileSync(path.join(projectRoot, "package.json"), "utf8")
+    );
+    const functionPath = path.join(projectRoot, "server", "vercel-api.ts");
     const functionSource = fs.readFileSync(functionPath, "utf8");
 
-    expect(functionSource).toContain('import { createApp } from "../server/_core/app"');
+    expect(packageJson.scripts["build:vercel"]).toContain("esbuild server/vercel-api.ts");
+    expect(packageJson.scripts["build:vercel"]).toContain("--outfile=api/index.js");
+    expect(functionSource).toContain('import { createApp } from "./_core/app"');
     expect(functionSource).toContain("export default function handler");
     expect(functionSource).toContain('requestUrl.searchParams.get("path")');
     expect(functionSource).toContain("return app(req, res)");

@@ -49,3 +49,9 @@ The captured live production DOM contains all seven expected `files.manuscdn.com
 Vercel’s Production resource list shows one Node.js function at the literal path `/api/[...path]`. Two correctly formed requests to `/api/trpc/commerce.products.list` returned the Vercel `404: NOT_FOUND` page before reaching tRPC. This establishes that the bracketed filename was emitted as a literal route rather than a usable catch-all API route and must be replaced with explicit Vercel routing.
 
 Vercel’s routing guide documents `:path*` captures in `vercel.json` rewrites, and its Node.js Functions guide confirms that a TypeScript file at `api/index.ts` is a supported function entry point. The replacement will therefore route `/api/:path*` to `api/index.ts`, preserve the captured API subpath, and hand that reconstructed request to the existing Express+tRPC application. Sources: https://vercel.com/docs/routing/rewrites and https://vercel.com/docs/functions/runtimes/node-js.
+
+The rewrite-backed fix was pushed as commit `5acb820` and Vercel completed Preview deployment `BSguCcehY7oGUakyL6p6yRJYshMT` successfully. The next step is to test the new Preview API route before any Production promotion.
+
+The Preview request now reaches `/api` but returns Vercel `FUNCTION_INVOCATION_FAILED` (HTTP 500) rather than the previous route-level 404. This confirms the rewrite is active and narrows the remaining issue to the function’s startup or invocation runtime; Vercel runtime logs are being inspected next.
+
+Vercel’s runtime log identifies `ERR_MODULE_NOT_FOUND`: the function cannot resolve `/var/task/server/_core/app` imported by `api/index.ts`. The rewrite is correct, but the API entry must use a bundled implementation of the shared Express application because Vercel does not package that source-module path into the individual function by default.

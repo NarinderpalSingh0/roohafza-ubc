@@ -47,7 +47,7 @@ pnpm build
 | `server/routers/commerce.ts` | Shopify Storefront API product, cart, and checkout procedures. |
 | `server/newsletter.ts` | Newsletter subscription persistence. |
 | `server/_core/app.ts` | Reusable Express+tRPC API factory. |
-| `api/index.ts` | Vercel serverless entry point; `vercel.json` rewrites `/api/:path*` requests to this function. |
+| `server/vercel-api.ts` | Source entry bundled into Vercel’s generated `api/index.js` function. |
 | `vercel.json` | pnpm install/build configuration and static output directory. |
 
 ## Required environment variables
@@ -74,7 +74,7 @@ Do not commit `.env` files or any credentials. Local development and the Manus-m
 
 ## Deploy to Vercel
 
-The recommended deployment source is the repository’s current default branch: **`manus/roohafza-latest`**. The deployment configuration uses `pnpm install --frozen-lockfile`, runs `pnpm build`, serves `dist/public` as the Vite client output, and rewrites `/api/:path*` requests to the Express+tRPC function in `api/index.ts`.
+The recommended deployment source is the repository’s current default branch: **`manus/roohafza-latest`**. The deployment configuration uses `pnpm install --frozen-lockfile`, runs `pnpm build:vercel`, serves `dist/public` as the Vite client output, bundles `server/vercel-api.ts` as `api/index.js`, and rewrites `/api/:path*` requests to that Express+tRPC function.
 
 1. Import `NarinderpalSingh0/roohafza-ubc` into Vercel.
 2. Set the Production Branch to `manus/roohafza-latest`.
