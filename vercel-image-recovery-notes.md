@@ -65,3 +65,9 @@ The user approved promotion of `e649920` (`fix: show full Roohafza artwork`) to 
 Production deployment `EFoBCpfrHaFU3YwJCS2Rh9B3ouY2` is now Ready and assigned to `roohafza-ubc.vercel.app`. A live Chrome-session check confirms the campaign photo and full Rose can are visible within the campaign frame without the former object-cover crop.
 
 A final live Production capture also shows the Straberry lifestyle campaign image fully contained inside its blue frame, including both people, the table, and the full central can. The new `object-fit: contain` artwork treatment is live at `https://roohafza-ubc.vercel.app`.
+
+The subsequent solid-colour refinement was verified in Vercel Preview deployment `8Mw8GDrqyWcsJRhLnMjZG7Wks1Go` for commit `5d60381`. The browser preview shows a sharp, complete Rose lifestyle image and can, framed by a deliberate deep-green brand-colour surround rather than a blurred image fill or white empty area. Desktop composition is balanced; the matching mobile view was also verified locally.
+
+The user approved promotion of commit `5d60381` to Production. Vercel created Production deployment `GWBQD74khhbpzqQvHdcKkiceNjoh` from the verified Preview and began its Production rebuild before assigning `roohafza-ubc.vercel.app`.
+
+Production deployment `GWBQD74khhbpzqQvHdcKkiceNjoh` is Ready, Current, and assigned to `roohafza-ubc.vercel.app`. The final live browser view confirms the sharp full Rose photo and can sit within an intentional deep-green solid surround, with no blurred fill or empty white area inside the campaign panel.
