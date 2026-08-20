@@ -72,6 +72,7 @@
 - [x] Refine the referenced store-locator map container and its integrated controls across desktop and mobile layouts.
 - [x] Add city-specific retailer result cards with operating hours, contact details, and directions links after location searches.
 - [x] Add a smooth, accessible mobile toggle between the locator map and retailer list views.
+- [ ] Push the live retailer locator update to Vercel and verify the public Production release.
 - [x] Commit the bundled `api/index.js` function artifact so Vercel discovers the API route before executing the build command.
 - [x] Publish the verified full-artwork framing update and report the essential Vercel API status within the expedited delivery window.
 - [x] Promote commit e649920 to Vercel Production and confirm the uncropped artwork is live.
