@@ -46,7 +46,7 @@
 - [x] Add an accessible flavor-detail modal opened from each campaign CTA.
 - [x] Preserve a deferred campaign-discount-code placeholder without inventing codes.
 - [x] Validate the carousel controls and modal across desktop and mobile, then save a checkpoint.
-- [ ] Commit and push the latest Roohafza website changes to the connected GitHub repository.
+- [ ] Commit and push the latest Roohafza website changes to NarinderpalSingh0/roohafza-ubc.
 - [x] Add keyboard arrow-key navigation and Home/End shortcuts to the campaign carousel.
 - [x] Add related-flavor links inside every flavor-detail modal.
 - [x] Preserve the deferred discount-code experience without inventing codes.
