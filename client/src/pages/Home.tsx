@@ -9,7 +9,7 @@ import { CSSProperties, FormEvent, useEffect, useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { StoreLocator } from "@/components/StoreLocator";
 import { ShopSection } from "@/components/ShopSection";
-import { CAMPAIGN_AUTOPLAY_ENABLED, CAMPAIGN_AUTOPLAY_MS, campaignSlides, getCampaignShopTarget, getNextCampaignIndex, getPreviousCampaignIndex } from "@/data/campaignSlides";
+import { CAMPAIGN_AUTOPLAY_ENABLED, CAMPAIGN_AUTOPLAY_MS, campaignSlides, getCampaignIndexForKey, getCampaignShopTarget, getNextCampaignIndex, getPreviousCampaignIndex, getRelatedCampaignSlides } from "@/data/campaignSlides";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const products = [
@@ -119,6 +119,13 @@ export default function Home() {
     setActiveFlavorDetail(slide);
   };
 
+  const handleCarouselKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
+    if (!["ArrowRight", "ArrowLeft", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+    setCampaignPaused(true);
+    setCampaignIndex(current => getCampaignIndexForKey(event.key, current));
+  };
+
   const finishCampaignSwipe = (clientX: number) => {
     if (campaignTouchStart === null) return;
     const distance = clientX - campaignTouchStart;
@@ -149,7 +156,7 @@ export default function Home() {
       </header>
 
       <main id="top">
-        <section className="campaign-stage section-pad" aria-label="Roohafza campaign carousel" onFocusCapture={() => setCampaignPaused(true)}>
+        <section className="campaign-stage section-pad" aria-label="Roohafza campaign carousel" tabIndex={0} onFocusCapture={() => setCampaignPaused(true)} onKeyDown={handleCarouselKeyDown}>
           <div className="campaign-viewport" role="region" aria-roledescription="carousel" aria-label="Roohafza campaign stories" onTouchStart={(event) => setCampaignTouchStart(event.touches[0]?.clientX ?? null)} onTouchEnd={(event) => finishCampaignSwipe(event.changedTouches[0]?.clientX ?? 0)}>
             <div className="campaign-track" style={{ transform: `translateX(-${campaignIndex * 100}%)` }}>
               {campaignSlides.map((slide, index) => (
@@ -186,7 +193,7 @@ export default function Home() {
         <Dialog open={Boolean(activeFlavorDetail)} onOpenChange={(open) => { if (!open) setActiveFlavorDetail(null); }}>
           {activeFlavorDetail && <DialogContent className="flavor-detail-dialog" showCloseButton={false}>
             <div className="flavor-detail-image"><img src={activeFlavorDetail.image} alt={activeFlavorDetail.alt} /></div>
-            <div className="flavor-detail-copy"><DialogHeader><span className="section-kicker"><i />Roohafza flavor note</span><DialogTitle>{activeFlavorDetail.flavor}</DialogTitle><DialogDescription>{activeFlavorDetail.detail}</DialogDescription></DialogHeader><div className="flavor-detail-meta"><span>330 ml can</span><span>₹99</span><span>No campaign code needed</span></div><DialogFooter><DialogClose asChild><button className="flavor-detail-dismiss" type="button">Keep browsing</button></DialogClose><button className="flavor-detail-shop" type="button" onClick={() => { openCampaignProduct(activeFlavorDetail.handle); setActiveFlavorDetail(null); }}>Shop {activeFlavorDetail.flavor} <ArrowDownRight size={16} /></button></DialogFooter></div>
+            <div className="flavor-detail-copy"><DialogHeader><span className="section-kicker"><i />Roohafza flavor note</span><DialogTitle>{activeFlavorDetail.flavor}</DialogTitle><DialogDescription>{activeFlavorDetail.detail}</DialogDescription></DialogHeader><div className="flavor-detail-meta"><span>330 ml can</span><span>₹99</span><span>No campaign code needed</span></div><div className="flavor-related"><span>Related flavors</span><div>{getRelatedCampaignSlides(activeFlavorDetail.handle).map(slide => <button type="button" key={slide.handle} onClick={() => setActiveFlavorDetail(slide)}>{slide.flavor} <ArrowUpRight size={14} /></button>)}</div></div><DialogFooter><DialogClose asChild><button className="flavor-detail-dismiss" type="button">Keep browsing</button></DialogClose><button className="flavor-detail-shop" type="button" onClick={() => { openCampaignProduct(activeFlavorDetail.handle); setActiveFlavorDetail(null); }}>Shop {activeFlavorDetail.flavor} <ArrowDownRight size={16} /></button></DialogFooter></div>
           </DialogContent>}
         </Dialog>
         <section className="rooh-hero section-pad" aria-labelledby="hero-title">

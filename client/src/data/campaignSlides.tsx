@@ -56,6 +56,18 @@ export function getPreviousCampaignIndex(currentIndex: number) {
   return (currentIndex - 1 + campaignSlides.length) % campaignSlides.length;
 }
 
+export function getCampaignIndexForKey(key: string, currentIndex: number) {
+  if (key === "ArrowRight") return getNextCampaignIndex(currentIndex);
+  if (key === "ArrowLeft") return getPreviousCampaignIndex(currentIndex);
+  if (key === "Home") return 0;
+  if (key === "End") return campaignSlides.length - 1;
+  return currentIndex;
+}
+
+export function getRelatedCampaignSlides(handle: string) {
+  return campaignSlides.filter(slide => slide.handle !== handle);
+}
+
 export function getCampaignShopTarget(handle: string) {
   return `shop-${handle}`;
 }
