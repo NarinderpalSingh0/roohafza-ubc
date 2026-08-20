@@ -61,6 +61,8 @@
 - [ ] Confirm the deployed Vercel preview after the required production environment variables are added.
 - [ ] Inspect Vercel Production environment-variable coverage and confirm the live Shopify and newsletter tRPC flows.
 - [ ] Restore the missing Vercel `/api/trpc` runtime route and validate the live Shopify and newsletter API surface.
+- [ ] Add the required Shopify, database, and session environment variables to Vercel Production and verify the live commerce flow.
+- [x] Expand the store locator into a full-width, responsive map treatment with the controls integrated over or alongside the map.
 - [x] Commit the bundled `api/index.js` function artifact so Vercel discovers the API route before executing the build command.
 - [x] Publish the verified full-artwork framing update and report the essential Vercel API status within the expedited delivery window.
 - [x] Promote commit e649920 to Vercel Production and confirm the uncropped artwork is live.

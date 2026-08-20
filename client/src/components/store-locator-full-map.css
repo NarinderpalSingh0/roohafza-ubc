@@ -1,0 +1,60 @@
+.locator-layout {
+  display: block;
+  margin-top: 3.25rem;
+}
+
+.map-frame.map-frame--full {
+  min-height: 620px;
+  border-radius: 1.5rem;
+  box-shadow: 0 20px 44px rgba(35, 18, 15, 0.16);
+}
+
+.map-frame--full .roohafza-map {
+  display: block;
+  width: 100%;
+  height: 620px !important;
+}
+
+.locator-panel.locator-panel--overlay {
+  position: absolute;
+  z-index: 3;
+  top: 1.25rem;
+  left: 1.25rem;
+  width: min(360px, calc(100% - 2.5rem));
+  min-height: calc(100% - 2.5rem);
+  padding: 1.45rem;
+  border: 1px solid rgba(255, 248, 235, 0.22);
+  background: rgba(35, 18, 15, 0.92);
+  box-shadow: 0 16px 36px rgba(35, 18, 15, 0.28);
+  backdrop-filter: blur(12px);
+}
+
+.locator-panel--overlay h3 {
+  margin-top: 1.5rem;
+}
+
+.map-frame--full .map-caption {
+  z-index: 2;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  left: auto;
+}
+
+@media (max-width: 700px) {
+  .locator-layout { margin-top: 2rem; }
+  .map-frame.map-frame--full { min-height: 670px; border-radius: 1.2rem; }
+  .map-frame--full .roohafza-map { height: 670px !important; }
+  .locator-panel.locator-panel--overlay {
+    top: auto;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    left: 0.75rem;
+    width: auto;
+    min-height: 0;
+    max-height: calc(100% - 1.5rem);
+    overflow-y: auto;
+    padding: 1.1rem;
+  }
+  .locator-panel--overlay h3 { margin: 1rem 0 1.2rem; font-size: 2.45rem; }
+  .map-frame--full .map-caption { right: auto; bottom: auto; left: 0.85rem; top: 0.85rem; }
+}

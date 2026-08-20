@@ -71,3 +71,5 @@ The subsequent solid-colour refinement was verified in Vercel Preview deployment
 The user approved promotion of commit `5d60381` to Production. Vercel created Production deployment `GWBQD74khhbpzqQvHdcKkiceNjoh` from the verified Preview and began its Production rebuild before assigning `roohafza-ubc.vercel.app`.
 
 Production deployment `GWBQD74khhbpzqQvHdcKkiceNjoh` is Ready, Current, and assigned to `roohafza-ubc.vercel.app`. The final live browser view confirms the sharp full Rose photo and can sit within an intentional deep-green solid surround, with no blurred fill or empty white area inside the campaign panel.
+
+The store locator was also refactored from a split panel/map grid to a single full-width map canvas. Its controls now form a dark integrated overlay on desktop and move to a safe bottom overlay on mobile, preserving the locator search, location, city-shortcut, status, and retailer-link interactions.

@@ -1,5 +1,6 @@
 import { ExternalLink, LocateFixed, Search } from "lucide-react";
 import { FormEvent, useMemo, useState } from "react";
+import "./store-locator-full-map.css";
 
 const popularAreas = [
   { label: "Delhi", lat: 28.6139, lng: 77.209 },
@@ -78,28 +79,27 @@ export function StoreLocator() {
       </div>
 
       <div className="locator-layout">
-        <div className="locator-panel">
-          <span className="panel-number">01 / LOCATE</span>
-          <h3>Where should we look?</h3>
-          <form className="locator-form" onSubmit={handleSearch}>
-            <label htmlFor="location-search">City or PIN code</label>
-            <div className="field-row">
-              <input id="location-search" value={location} onChange={(event) => setLocation(event.target.value)} placeholder="e.g. Delhi or 110001" />
-              <button type="submit" aria-label="Search location"><Search size={18} /></button>
-            </div>
-          </form>
-          <button className="locator-secondary" type="button" onClick={useMyLocation}><LocateFixed size={16} />Use my location</button>
-          <div className="popular-areas" aria-label="Popular cities">
-            <span>Popular cities</span>
-            <div>{popularAreas.map((area) => <button key={area.label} type="button" onClick={() => setPopularArea(area)}>{area.label}</button>)}</div>
-          </div>
-          <p className="locator-status" aria-live="polite">{status}</p>
-          <a className="maps-link" href={`https://www.google.com/maps/search/?api=1&query=${mapsQuery}`} target="_blank" rel="noreferrer">Open nearby retailer search <ExternalLink size={15} /></a>
-        </div>
-
-        <div className="map-frame">
+        <div className="map-frame map-frame--full">
           <iframe className="roohafza-map" src={mapSrc} title="Interactive map for the Roohafza store locator" loading="lazy" />
           <div className="map-caption"><span>Roohafza Locator</span><b>Explore {mapCenter.label}</b></div>
+          <div className="locator-panel locator-panel--overlay">
+            <span className="panel-number">01 / LOCATE</span>
+            <h3>Where should we look?</h3>
+            <form className="locator-form" onSubmit={handleSearch}>
+              <label htmlFor="location-search">City or PIN code</label>
+              <div className="field-row">
+                <input id="location-search" value={location} onChange={(event) => setLocation(event.target.value)} placeholder="e.g. Delhi or 110001" />
+                <button type="submit" aria-label="Search location"><Search size={18} /></button>
+              </div>
+            </form>
+            <button className="locator-secondary" type="button" onClick={useMyLocation}><LocateFixed size={16} />Use my location</button>
+            <div className="popular-areas" aria-label="Popular cities">
+              <span>Popular cities</span>
+              <div>{popularAreas.map((area) => <button key={area.label} type="button" onClick={() => setPopularArea(area)}>{area.label}</button>)}</div>
+            </div>
+            <p className="locator-status" aria-live="polite">{status}</p>
+            <a className="maps-link" href={`https://www.google.com/maps/search/?api=1&query=${mapsQuery}`} target="_blank" rel="noreferrer">Open nearby retailer search <ExternalLink size={15} /></a>
+          </div>
         </div>
       </div>
     </section>
