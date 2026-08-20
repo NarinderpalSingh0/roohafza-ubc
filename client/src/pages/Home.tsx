@@ -9,7 +9,7 @@ import { CSSProperties, FormEvent, useEffect, useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { StoreLocator } from "@/components/StoreLocator";
 import { ShopSection } from "@/components/ShopSection";
-import { CAMPAIGN_AUTOPLAY_MS, campaignSlides, getCampaignShopTarget, getNextCampaignIndex } from "@/data/campaignSlides";
+import { CAMPAIGN_AUTOPLAY_ENABLED, CAMPAIGN_AUTOPLAY_MS, campaignSlides, getCampaignShopTarget, getNextCampaignIndex } from "@/data/campaignSlides";
 
 const products = [
   {
@@ -80,7 +80,7 @@ export default function Home() {
   const [subscribed, setSubscribed] = useState(false);
   const [heroShift, setHeroShift] = useState({ x: 0, y: 0 });
   const [campaignIndex, setCampaignIndex] = useState(0);
-  const [campaignPaused, setCampaignPaused] = useState(false);
+  const [campaignPaused, setCampaignPaused] = useState(!CAMPAIGN_AUTOPLAY_ENABLED);
   const newsletter = trpc.newsletter.subscribe.useMutation({
     onSuccess: () => {
       setSubscribed(true);
@@ -132,13 +132,14 @@ export default function Home() {
       </header>
 
       <main id="top">
-        <section className="campaign-stage section-pad" aria-label="Roohafza campaign carousel" onMouseEnter={() => setCampaignPaused(true)} onMouseLeave={() => setCampaignPaused(false)} onFocusCapture={() => setCampaignPaused(true)}>
+        <section className="campaign-stage section-pad" aria-label="Roohafza campaign carousel" onFocusCapture={() => setCampaignPaused(true)}>
           <div className="campaign-viewport" role="region" aria-roledescription="carousel" aria-label="Roohafza campaign stories">
             <div className="campaign-track" style={{ transform: `translateX(-${campaignIndex * 100}%)` }}>
               {campaignSlides.map((slide, index) => (
                 <article className={`campaign-feature ${slide.tone}`} id={`campaign-slide-${index + 1}`} key={slide.handle} aria-hidden={campaignIndex !== index} inert={campaignIndex !== index}>
                   <div className="campaign-art">
                     <img src={slide.image} alt={slide.alt} />
+                    <span className="campaign-art-sidecopy">{slide.imageNote}</span>
                     <span className="campaign-art-caption">{slide.caption}</span>
                   </div>
                   <div className="campaign-copy">

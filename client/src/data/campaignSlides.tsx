@@ -1,6 +1,7 @@
 import React from "react";
 
 export const CAMPAIGN_AUTOPLAY_MS = 5600;
+export const CAMPAIGN_AUTOPLAY_ENABLED = true;
 
 export const campaignSlides = [
   {
@@ -12,6 +13,7 @@ export const campaignSlides = [
     image: "/manus-storage/roohafza-rose-hydration_c571f84f.jpg",
     alt: "A Roohafza Rose can held in two hands against a deep green background.",
     caption: <>Rose.<br />In hand.</>,
+    imageNote: "Rose + vitamin C · a bright little pause",
     footer: "First sip, fresh start",
     tone: "campaign-rose",
   },
@@ -24,6 +26,7 @@ export const campaignSlides = [
     image: "/manus-storage/roohafza-shared-table_910c0fa5.jpg",
     alt: "Friends sharing Roohafza cans across a table with a Straberry can in front.",
     caption: <>Straberry.<br />Share it.</>,
+    imageNote: "Straberry + zinc · made for the table",
     footer: "Made for the table",
     tone: "campaign-straberry",
   },
@@ -36,6 +39,7 @@ export const campaignSlides = [
     image: "/manus-storage/roohafza-shared-lounge_7f55cc1b.jpg",
     alt: "Friends gathered around a green sofa holding a Roohafza Berry Bust can.",
     caption: <>Berry Bust.<br />Bring the gang.</>,
+    imageNote: "Berry Bust + antioxidants · chill with the crew",
     footer: "Best with the whole crew",
     tone: "campaign-berry-bust",
   },

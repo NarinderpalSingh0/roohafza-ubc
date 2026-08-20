@@ -30,3 +30,6 @@
 - [x] Add two campaign variations with interactive pagination dots and flavor-specific shop links.
 - [x] Add smooth carousel transitions with accessible auto-play that pauses on interaction and reduced-motion settings.
 - [x] Validate desktop and mobile carousel controls, linked shop journeys, and save a checkpoint.
+- [x] Add clear supporting copy on the carousel image side for each lifestyle slide.
+- [x] Make carousel auto-play active by default while preserving the visitor pause control.
+- [x] Validate the refined carousel across desktop and mobile, then save a checkpoint.

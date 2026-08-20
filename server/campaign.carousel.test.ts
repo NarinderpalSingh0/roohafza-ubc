@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CAMPAIGN_AUTOPLAY_MS, campaignSlides, getCampaignShopTarget, getNextCampaignIndex } from "../client/src/data/campaignSlides";
+import { CAMPAIGN_AUTOPLAY_ENABLED, CAMPAIGN_AUTOPLAY_MS, campaignSlides, getCampaignShopTarget, getNextCampaignIndex } from "../client/src/data/campaignSlides";
 
 describe("campaign carousel configuration", () => {
   it("defines three distinct campaign slides with matching published shop handles", () => {
@@ -13,6 +13,7 @@ describe("campaign carousel configuration", () => {
   });
 
   it("uses a positive auto-play interval", () => {
+    expect(CAMPAIGN_AUTOPLAY_ENABLED).toBe(true);
     expect(CAMPAIGN_AUTOPLAY_MS).toBeGreaterThan(0);
   });
 
