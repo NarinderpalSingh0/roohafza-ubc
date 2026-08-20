@@ -61,8 +61,9 @@
 - [ ] Confirm the deployed Vercel preview after the required production environment variables are added.
 - [ ] Inspect Vercel Production environment-variable coverage and confirm the live Shopify and newsletter tRPC flows.
 - [ ] Restore the missing Vercel `/api/trpc` runtime route and validate the live Shopify and newsletter API surface.
-- [ ] Commit the bundled `api/index.js` function artifact so Vercel discovers the API route before executing the build command.
-- [ ] Publish the verified full-artwork framing update and report the essential Vercel API status within the expedited delivery window.
+- [x] Commit the bundled `api/index.js` function artifact so Vercel discovers the API route before executing the build command.
+- [x] Publish the verified full-artwork framing update and report the essential Vercel API status within the expedited delivery window.
+- [x] Promote commit e649920 to Vercel Production and confirm the uncropped artwork is live.
 - [x] Adjust Roohafza campaign and can-image framing so full artwork is visible without cropped edges on desktop and mobile.
 - [x] Add a deployment-focused README with local development, Shopify, and Vercel setup instructions.
 - [x] Review the manus/roohafza-latest versus develop divergence and safely incorporate compatible upstream history without overwriting either branch.

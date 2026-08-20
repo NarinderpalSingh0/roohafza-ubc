@@ -57,3 +57,11 @@ The Preview request now reaches `/api` but returns Vercel `FUNCTION_INVOCATION_F
 Vercel’s runtime log identifies `ERR_MODULE_NOT_FOUND`: the function cannot resolve `/var/task/server/_core/app` imported by `api/index.ts`. The rewrite is correct, but the API entry must use a bundled implementation of the shared Express application because Vercel does not package that source-module path into the individual function by default.
 
 The bundled source entry was validated locally and pushed as `489dfc6`; its Preview deployment completed. However, the Preview `/api/trpc/commerce.products.list` request has reverted to Vercel `404: NOT_FOUND`, indicating that a function generated during `buildCommand` is not being recognized as an API route by this deployment configuration. The next diagnostic is to inspect this deployment’s resources and use a source-discoverable entrypoint if needed.
+
+The tracked `api/index.js` entry fixed Vercel source discovery. The latest Preview for commit `e649920` responds from `commerce.products.list` with a typed tRPC error—`Shopify Storefront API is not configured`—rather than a Vercel 404 or function crash. This confirms the API routing and bundle now work. The remaining blocker for live commerce is the absent Vercel environment-variable configuration; the project currently has no Vercel variables configured.
+
+The user approved promotion of `e649920` (`fix: show full Roohafza artwork`) to Production. Vercel created Production deployment `EFoBCpfrHaFU3YwJCS2Rh9B3ouY2` from that commit and is rebuilding it with the Production environment before assigning `roohafza-ubc.vercel.app`.
+
+Production deployment `EFoBCpfrHaFU3YwJCS2Rh9B3ouY2` is now Ready and assigned to `roohafza-ubc.vercel.app`. A live Chrome-session check confirms the campaign photo and full Rose can are visible within the campaign frame without the former object-cover crop.
+
+A final live Production capture also shows the Straberry lifestyle campaign image fully contained inside its blue frame, including both people, the table, and the full central can. The new `object-fit: contain` artwork treatment is live at `https://roohafza-ubc.vercel.app`.
