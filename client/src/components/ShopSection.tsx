@@ -32,7 +32,7 @@ function LiveShopCard({ product }: { product: Product }) {
   };
 
   return (
-    <article className="shop-card live-shop-card">
+    <article className="shop-card live-shop-card" id={`shop-${product.handle}`} tabIndex={-1}>
       <div className="shop-card-image">{image ? <img src={image.url} alt={image.altText ?? product.title} /> : <div className="shop-placeholder">Roohafza</div>}</div>
       <div className="shop-card-copy"><span>Roohafza shop</span><h3>{product.title}</h3><p>{product.description || "A bright little can for the moment you’re in."}</p><div className="shop-card-bottom"><b>{formatMoney(product.priceRange.min)}</b><button type="button" disabled={!variant?.availableForSale || loading} onClick={addToCart}>{loading ? "Adding…" : variant?.availableForSale ? "Add to bag" : "Sold out"}<ShoppingBag size={15} /></button></div>{error && <small className="shop-error">{error}</small>}</div>
     </article>

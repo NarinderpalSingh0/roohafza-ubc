@@ -5,10 +5,11 @@
  * celebratory and original—never generic beverage catalogue UI.
  */
 import { ArrowDownRight, ArrowUpRight, Check, Instagram, Menu, MoveUpRight, Sparkles, X } from "lucide-react";
-import { CSSProperties, FormEvent, useState } from "react";
+import { CSSProperties, FormEvent, useEffect, useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { StoreLocator } from "@/components/StoreLocator";
 import { ShopSection } from "@/components/ShopSection";
+import { CAMPAIGN_AUTOPLAY_MS, campaignSlides, getCampaignShopTarget, getNextCampaignIndex } from "@/data/campaignSlides";
 
 const products = [
   {
@@ -78,6 +79,8 @@ export default function Home() {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
   const [heroShift, setHeroShift] = useState({ x: 0, y: 0 });
+  const [campaignIndex, setCampaignIndex] = useState(0);
+  const [campaignPaused, setCampaignPaused] = useState(false);
   const newsletter = trpc.newsletter.subscribe.useMutation({
     onSuccess: () => {
       setSubscribed(true);
@@ -89,6 +92,23 @@ export default function Home() {
     event.preventDefault();
     setSubscribed(false);
     newsletter.mutate({ email });
+  };
+
+  useEffect(() => {
+    if (campaignPaused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timer = window.setInterval(() => setCampaignIndex(getNextCampaignIndex), CAMPAIGN_AUTOPLAY_MS);
+    return () => window.clearInterval(timer);
+  }, [campaignPaused]);
+
+  const showCampaign = (index: number) => {
+    setCampaignPaused(true);
+    setCampaignIndex(index);
+  };
+
+  const openCampaignProduct = (handle: string) => {
+    setCampaignPaused(true);
+    const productCard = document.getElementById(getCampaignShopTarget(handle)) ?? document.getElementById("shop");
+    productCard?.scrollIntoView({ behavior: "smooth", block: "center" });
   };
 
   const navItems = [
@@ -112,26 +132,33 @@ export default function Home() {
       </header>
 
       <main id="top">
-        <section className="campaign-stage section-pad" aria-labelledby="campaign-title">
-          <div className="campaign-edge campaign-edge-left" aria-hidden="true" />
-          <article className="campaign-feature">
-            <div className="campaign-art" aria-hidden="true">
-              <div className="campaign-art-orbit" />
-              <div className="campaign-art-line line-one" /><div className="campaign-art-line line-two" />
-              <img src="/manus-storage/roohafza-berry-bust_52910888.png" alt="" />
-              <span className="campaign-art-caption">Berry<br />bright.</span>
+        <section className="campaign-stage section-pad" aria-label="Roohafza campaign carousel" onMouseEnter={() => setCampaignPaused(true)} onMouseLeave={() => setCampaignPaused(false)} onFocusCapture={() => setCampaignPaused(true)}>
+          <div className="campaign-viewport" role="region" aria-roledescription="carousel" aria-label="Roohafza campaign stories">
+            <div className="campaign-track" style={{ transform: `translateX(-${campaignIndex * 100}%)` }}>
+              {campaignSlides.map((slide, index) => (
+                <article className={`campaign-feature ${slide.tone}`} id={`campaign-slide-${index + 1}`} key={slide.handle} aria-hidden={campaignIndex !== index} inert={campaignIndex !== index}>
+                  <div className="campaign-art">
+                    <img src={slide.image} alt={slide.alt} />
+                    <span className="campaign-art-caption">{slide.caption}</span>
+                  </div>
+                  <div className="campaign-copy">
+                    <span className="campaign-ticket">{slide.label}</span>
+                    <p className="campaign-eyebrow">{slide.eyebrow}</p>
+                    <h2>{slide.title}</h2>
+                    <button className="campaign-cta" type="button" onClick={() => openCampaignProduct(slide.handle)}>Shop {slide.flavor} <ArrowDownRight size={17} /></button>
+                    <span className="campaign-legal">330 ml of bright breaks · ₹99 each</span>
+                  </div>
+                  <div className="campaign-footer"><span>Roohafza · your mood, your can</span><b>✦</b><span>{slide.footer}</span></div>
+                </article>
+              ))}
             </div>
-            <div className="campaign-copy">
-              <span className="campaign-ticket">Roohafza mood drop</span>
-              <p className="campaign-eyebrow">A little something for your break</p>
-              <h2 id="campaign-title">A cooler<br />moment is<br /><em>waiting for you.</em></h2>
-              <button className="campaign-cta" type="button" onClick={() => scrollToId("cans")}>Meet the cans <ArrowDownRight size={17} /></button>
-              <span className="campaign-legal">330 ml of bright breaks · ₹99 each</span>
+          </div>
+          <div className="campaign-controls">
+            <div className="campaign-dots" role="tablist" aria-label="Choose a Roohafza campaign story">
+              {campaignSlides.map((slide, index) => <button type="button" key={slide.handle} role="tab" aria-selected={campaignIndex === index} aria-controls={`campaign-slide-${index + 1}`} aria-label={`Show ${slide.flavor} campaign`} className={campaignIndex === index ? "is-active" : ""} onClick={() => showCampaign(index)} />)}
             </div>
-            <div className="campaign-footer"><span>Roohafza · your mood, your can</span><b>✦</b><span>Original drop 01</span></div>
-          </article>
-          <div className="campaign-edge campaign-edge-right" aria-hidden="true" />
-          <div className="campaign-dots" aria-label="Campaign feature 1 of 3"><b /><i /><i /><i /></div>
+            <button className="campaign-autoplay-toggle" type="button" onClick={() => setCampaignPaused((paused) => !paused)} aria-label={campaignPaused ? "Play campaign carousel" : "Pause campaign carousel"}>{campaignPaused ? "Play stories" : "Pause stories"}</button>
+          </div>
         </section>
         <section className="rooh-hero section-pad" aria-labelledby="hero-title">
           <div className="hero-waves" aria-hidden="true"><i /><i /><i /></div>

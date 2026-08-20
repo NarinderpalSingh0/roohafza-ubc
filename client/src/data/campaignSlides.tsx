@@ -1,0 +1,50 @@
+import React from "react";
+
+export const CAMPAIGN_AUTOPLAY_MS = 5600;
+
+export const campaignSlides = [
+  {
+    flavor: "Rose",
+    handle: "roohafza-rose-330ml",
+    label: "Roohafza hydration break",
+    eyebrow: "A bright pause, in your hands",
+    title: <>A fresh little<br />break for your<br /><em>everyday.</em></>,
+    image: "/manus-storage/roohafza-rose-hydration_c571f84f.jpg",
+    alt: "A Roohafza Rose can held in two hands against a deep green background.",
+    caption: <>Rose.<br />In hand.</>,
+    footer: "First sip, fresh start",
+    tone: "campaign-rose",
+  },
+  {
+    flavor: "Straberry",
+    handle: "roohafza-straberry-330ml",
+    label: "Roohafza table talk",
+    eyebrow: "A can for the good company",
+    title: <>Pass the plate.<br />Pass the<br /><em>bright side.</em></>,
+    image: "/manus-storage/roohafza-shared-table_910c0fa5.jpg",
+    alt: "Friends sharing Roohafza cans across a table with a Straberry can in front.",
+    caption: <>Straberry.<br />Share it.</>,
+    footer: "Made for the table",
+    tone: "campaign-straberry",
+  },
+  {
+    flavor: "Berry Bust",
+    handle: "roohafza-berry-bust-330ml",
+    label: "Roohafza living room drop",
+    eyebrow: "When the whole gang is in",
+    title: <>Turn the chill<br />into a<br /><em>bright break.</em></>,
+    image: "/manus-storage/roohafza-shared-lounge_7f55cc1b.jpg",
+    alt: "Friends gathered around a green sofa holding a Roohafza Berry Bust can.",
+    caption: <>Berry Bust.<br />Bring the gang.</>,
+    footer: "Best with the whole crew",
+    tone: "campaign-berry-bust",
+  },
+] as const;
+
+export function getNextCampaignIndex(currentIndex: number) {
+  return (currentIndex + 1) % campaignSlides.length;
+}
+
+export function getCampaignShopTarget(handle: string) {
+  return `shop-${handle}`;
+}

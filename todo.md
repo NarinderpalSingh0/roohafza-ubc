@@ -26,3 +26,7 @@
 - [x] Validate the revised home page and save a checkpoint.
 - [x] Add an original Roohafza campaign-feature card above the main hero with ticket label, product-led panel, and pagination cues.
 - [x] Verify the new campaign-feature card on desktop and mobile, then save a checkpoint.
+- [x] Upload the supplied Roohafza lifestyle imagery to project-safe web storage for the carousel.
+- [x] Add two campaign variations with interactive pagination dots and flavor-specific shop links.
+- [x] Add smooth carousel transitions with accessible auto-play that pauses on interaction and reduced-motion settings.
+- [x] Validate desktop and mobile carousel controls, linked shop journeys, and save a checkpoint.
