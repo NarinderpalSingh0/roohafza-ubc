@@ -58,13 +58,13 @@
 - [x] Validate the Vercel-compatible build and push the deployment fix to manus/roohafza-latest.
 - [x] Assess and configure the Express+tRPC runtime for Vercel, or document a static-only deployment scope.
 - [x] Verify the configured Vercel deployment can support the required shop, newsletter, and API-backed features.
-- [ ] Confirm the deployed Vercel preview after the required production environment variables are added.
-- [ ] Inspect Vercel Production environment-variable coverage and confirm the live Shopify and newsletter tRPC flows.
-- [ ] Restore the missing Vercel `/api/trpc` runtime route and validate the live Shopify and newsletter API surface.
-- [ ] Add the required Shopify, database, and session environment variables to Vercel Production and verify the live commerce flow.
-- [ ] Restore the Vercel Production Shopify catalogue so all three 330 ml cans show ₹99 pricing and functional Add to Cart controls instead of the placeholder cards.
+- [x] Confirm the deployed Vercel preview after the required production environment variables are added.
+- [x] Inspect Vercel Production environment-variable coverage and confirm the live Shopify and newsletter tRPC flows.
+- [x] Restore the missing Vercel `/api/trpc` runtime route and validate the live Shopify and newsletter API surface.
+- [x] Add the required Shopify, database, and session environment variables to Vercel Production and verify the live commerce flow.
+- [x] Restore the Vercel Production Shopify catalogue so all three 330 ml cans show ₹99 pricing and functional Add to Cart controls instead of the placeholder cards.
 - [x] Expand the store locator into a full-width, responsive map treatment with the controls integrated over or alongside the map.
-- [ ] Fix the deployed locator map so it fills the full map canvas instead of rendering as a narrow column beside unused space.
+- [x] Fix the deployed locator map so it fills the full map canvas instead of rendering as a narrow column beside unused space.
 - [x] Add a visible, accessible cart option to the site header that opens the existing shopping-cart experience.
 - [x] Commit the bundled `api/index.js` function artifact so Vercel discovers the API route before executing the build command.
 - [x] Publish the verified full-artwork framing update and report the essential Vercel API status within the expedited delivery window.
