@@ -1,7 +1,8 @@
-import { Clock3, ExternalLink, Heart, HeartOff, List, LocateFixed, Map as MapIcon, Navigation, Phone, Search, Store, LoaderCircle } from "lucide-react";
+import { Clock3, ExternalLink, Heart, HeartOff, List, LocateFixed, Map as MapIcon, Navigation, Phone, RefreshCw, Search, Store, LoaderCircle } from "lucide-react";
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MapView } from "@/components/Map";
 import { createDirectionsUrl, formatRetailerHours } from "@/lib/retailerResults";
+import { createOpenStreetMapEmbedUrl } from "@/lib/locatorMap";
 import { persistSavedRetailers, readSavedRetailers, SavedRetailer, toggleSavedRetailer } from "@/lib/savedRetailers";
 import "./store-locator-full-map.css";
 import "./saved-retailer.css";
@@ -16,10 +17,6 @@ const popularAreas: MapCenter[] = [
   { label: "Lucknow", lat: 26.8467, lng: 80.9462 },
   { label: "Hyderabad", lat: 17.385, lng: 78.4867 },
 ];
-
-function toMapBounds(lat: number, lng: number, spread = 0.24) {
-  return `${lng - spread},${lat - spread},${lng + spread},${lat + spread}`;
-}
 
 function toRetailerResult(place: google.maps.places.PlaceResult): RetailerResult | null {
   if (!place.name || !place.geometry?.location) return null;
@@ -46,6 +43,8 @@ export function StoreLocator() {
   const [hasSearched, setHasSearched] = useState(false);
   const [mobileView, setMobileView] = useState<"map" | "list">("map");
   const [mapsSdkReady, setMapsSdkReady] = useState(false);
+  const [mapRefreshKey, setMapRefreshKey] = useState(0);
+  const [isRefreshingMap, setIsRefreshingMap] = useState(false);
   const mapRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
 
@@ -186,11 +185,16 @@ export function StoreLocator() {
   };
 
   const mapsQuery = useMemo(() => encodeURIComponent(`Roohafza cans near ${location.trim() || mapCenter.label}`), [location, mapCenter.label]);
-  const fallbackMapSrc = useMemo(() => {
-    const bbox = encodeURIComponent(toMapBounds(mapCenter.lat, mapCenter.lng));
-    const marker = encodeURIComponent(`${mapCenter.lat},${mapCenter.lng}`);
-    return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${marker}`;
-  }, [mapCenter]);
+  const fallbackMapSrc = useMemo(() => createOpenStreetMapEmbedUrl(mapCenter.lat, mapCenter.lng, mapRefreshKey), [mapCenter, mapRefreshKey]);
+
+  const refreshCurrentMap = () => {
+    mapRef.current = null;
+    setMapsSdkReady(false);
+    setIsRefreshingMap(true);
+    setMapRefreshKey((key) => key + 1);
+    setStatus(`Refreshing the map around ${mapCenter.label}…`);
+    window.setTimeout(() => setIsRefreshingMap(false), 700);
+  };
 
   return (
     <section className="locator-section section-pad" id="stores" aria-labelledby="locator-title">
@@ -204,9 +208,12 @@ export function StoreLocator() {
 
       <div className="locator-layout">
         <div className={`map-frame map-frame--full${mobileView === "list" ? " is-list-view" : ""}`}>
-          <iframe className={`roohafza-map-fallback${mapsSdkReady ? " is-covered" : ""}`} src={fallbackMapSrc} title="Map for the Roohafza store locator" loading="lazy" />
-          <MapView className={`roohafza-map${mapsSdkReady ? " is-ready" : ""}`} initialCenter={{ lat: mapCenter.lat, lng: mapCenter.lng }} initialZoom={12} onMapReady={handleMapReady} />
+          <iframe key={`fallback-${mapRefreshKey}`} className={`roohafza-map-fallback${mapsSdkReady ? " is-covered" : ""}`} src={fallbackMapSrc} title="Map for the Roohafza store locator" loading="lazy" />
+          <MapView key={`map-${mapRefreshKey}`} className={`roohafza-map${mapsSdkReady ? " is-ready" : ""}`} initialCenter={{ lat: mapCenter.lat, lng: mapCenter.lng }} initialZoom={12} onMapReady={handleMapReady} />
           <div className="map-caption"><span>Roohafza Locator</span><b>Explore {mapCenter.label}</b></div>
+          <button className="map-refresh" type="button" onClick={refreshCurrentMap} aria-label={`Refresh map around ${mapCenter.label}`} aria-busy={isRefreshingMap}>
+            <RefreshCw size={14} className={isRefreshingMap ? "is-spinning" : ""} />{isRefreshingMap ? "Refreshing" : "Refresh map"}
+          </button>
           <div className="mobile-locator-toggle" role="group" aria-label="Choose store locator view">
             <button type="button" className={mobileView === "map" ? "is-active" : ""} aria-pressed={mobileView === "map"} onClick={() => setMobileView("map")}><MapIcon size={14} />Map</button>
             <button type="button" className={mobileView === "list" ? "is-active" : ""} aria-pressed={mobileView === "list"} onClick={() => setMobileView("list")}><List size={14} />List</button>

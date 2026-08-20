@@ -96,6 +96,37 @@
   line-height: 1.05;
 }
 
+.map-frame--full .map-refresh {
+  position: absolute;
+  z-index: 3;
+  top: 5.8rem;
+  right: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+  min-height: 2.15rem;
+  padding: 0.48rem 0.68rem;
+  border: 1px solid rgba(255, 248, 235, 0.35);
+  border-radius: 999px;
+  background: rgba(35, 18, 15, 0.88);
+  color: #fff8eb;
+  font: inherit;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(35, 18, 15, 0.18);
+  backdrop-filter: blur(10px);
+  transition: transform 160ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)), background-color 160ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1));
+}
+
+.map-frame--full .map-refresh:hover { background: #3a211b; }
+.map-frame--full .map-refresh:active { transform: scale(0.97); }
+.map-frame--full .map-refresh:focus-visible { outline: 3px solid #cfeb38; outline-offset: 3px; }
+.map-frame--full .map-refresh .is-spinning { animation: rooh-map-refresh-spin 700ms linear infinite; }
+
+@keyframes rooh-map-refresh-spin { to { transform: rotate(360deg); } }
+
 .mobile-locator-toggle { display: none; }
 
 .retailer-loading {
@@ -226,6 +257,7 @@
     padding: 0.62rem 0.72rem;
   }
   .map-frame--full .map-caption b { font-size: 0.98rem; }
+  .map-frame--full .map-refresh { top: 4.75rem; right: 0.85rem; }
   .mobile-locator-toggle {
     position: absolute;
     z-index: 5;
@@ -273,6 +305,7 @@
 @media (prefers-reduced-motion: reduce) {
   .locator-panel.locator-panel--overlay,
   .locator-section .map-frame--full .roohafza-map,
+  .map-frame--full .map-refresh,
   .mobile-locator-toggle button,
   .retailer-directions,
   .retailer-loading svg { animation: none; transition: none; }

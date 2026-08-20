@@ -75,6 +75,7 @@
 - [x] Push the live retailer locator update to Vercel and verify the public Production release.
 - [x] Add privacy-friendly saved retailer favourites that persist locally across future visits.
 - [x] Restore visible map tiles in the Vercel Production locator with a compatible fallback when the client Maps SDK is unavailable.
+- [x] Add an accessible map-refresh control that reloads the current locator view without losing its selected location.
 - [x] Commit the bundled `api/index.js` function artifact so Vercel discovers the API route before executing the build command.
 - [x] Publish the verified full-artwork framing update and report the essential Vercel API status within the expedited delivery window.
 - [x] Promote commit e649920 to Vercel Production and confirm the uncropped artwork is live.
