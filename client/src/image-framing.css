@@ -1,0 +1,76 @@
+/* Keep every supplied campaign photo and product render completely visible. */
+.campaign-art {
+  display: grid;
+  place-items: center;
+}
+
+.campaign-art img {
+  object-fit: contain;
+  object-position: center;
+  padding: clamp(0.5rem, 1.4vw, 1rem);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .campaign-art-media {
+    animation: campaign-art-float 7.6s cubic-bezier(0.45, 0, 0.55, 1) infinite alternate;
+  }
+}
+
+@keyframes campaign-art-float {
+  from { transform: translate3d(-0.45%, 0.2%, 0); }
+  to { transform: translate3d(0.45%, -0.2%, 0); }
+}
+
+.flavor-detail-image {
+  display: grid;
+  place-items: center;
+}
+
+.flavor-detail-image img {
+  object-fit: contain;
+  object-position: center;
+  padding: 0.8rem;
+}
+
+.rooh-hero-product {
+  overflow: visible;
+}
+
+.rooh-hero-product > img {
+  height: clamp(390px, 54vw, 610px);
+  max-height: calc(100% - 1rem);
+  object-fit: contain;
+}
+
+.story-poster img {
+  bottom: 1rem;
+  height: min(500px, calc(100% - 2.5rem));
+  max-width: calc(100% - 2rem);
+  object-fit: contain;
+}
+
+.newsletter-can {
+  bottom: 1rem;
+  height: min(510px, calc(100% - 2rem));
+  max-width: calc(100% - 1.5rem);
+}
+
+.shop-card-image {
+  height: 290px;
+  padding: 0.5rem 0;
+}
+
+.shop-card-image img {
+  height: 250px;
+  max-width: calc(100% - 2rem);
+  object-fit: contain;
+}
+
+@media (max-width: 700px) {
+  .campaign-art img { padding: 0.5rem; }
+  .rooh-hero-product > img { height: clamp(360px, 104vw, 460px); }
+  .story-poster img { bottom: 0.75rem; height: min(430px, calc(100% - 2rem)); }
+  .newsletter-can { bottom: 0.75rem; height: min(390px, calc(100% - 1.5rem)); }
+  .shop-card-image { height: 265px; }
+  .shop-card-image img { height: 230px; }
+}
