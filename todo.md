@@ -24,3 +24,5 @@
 - [x] Rename the home-page flavor cards from Na Chalan and Naam Rakh Lena to Straberry and Rose.
 - [x] Add a “Your mood. Your can.” campaign bar to the home page.
 - [x] Validate the revised home page and save a checkpoint.
+- [x] Add an original Roohafza campaign-feature card above the main hero with ticket label, product-led panel, and pagination cues.
+- [x] Verify the new campaign-feature card on desktop and mobile, then save a checkpoint.

@@ -112,6 +112,27 @@ export default function Home() {
       </header>
 
       <main id="top">
+        <section className="campaign-stage section-pad" aria-labelledby="campaign-title">
+          <div className="campaign-edge campaign-edge-left" aria-hidden="true" />
+          <article className="campaign-feature">
+            <div className="campaign-art" aria-hidden="true">
+              <div className="campaign-art-orbit" />
+              <div className="campaign-art-line line-one" /><div className="campaign-art-line line-two" />
+              <img src="/manus-storage/roohafza-berry-bust_52910888.png" alt="" />
+              <span className="campaign-art-caption">Berry<br />bright.</span>
+            </div>
+            <div className="campaign-copy">
+              <span className="campaign-ticket">Roohafza mood drop</span>
+              <p className="campaign-eyebrow">A little something for your break</p>
+              <h2 id="campaign-title">A cooler<br />moment is<br /><em>waiting for you.</em></h2>
+              <button className="campaign-cta" type="button" onClick={() => scrollToId("cans")}>Meet the cans <ArrowDownRight size={17} /></button>
+              <span className="campaign-legal">330 ml of bright breaks · ₹99 each</span>
+            </div>
+            <div className="campaign-footer"><span>Roohafza · your mood, your can</span><b>✦</b><span>Original drop 01</span></div>
+          </article>
+          <div className="campaign-edge campaign-edge-right" aria-hidden="true" />
+          <div className="campaign-dots" aria-label="Campaign feature 1 of 3"><b /><i /><i /><i /></div>
+        </section>
         <section className="rooh-hero section-pad" aria-labelledby="hero-title">
           <div className="hero-waves" aria-hidden="true"><i /><i /><i /></div>
           <div className="rooh-hero-copy">

@@ -10,3 +10,6 @@ The form language most useful to translate is its use of strong field colors, cl
 
 The source’s carousel-like featured storytelling becomes one static-first “campaign chamber” with an optional product parallax and carefully staged entrance sequence. Instead of reusing a slider, Crimson Spark will use the impression of a campaign frame, with a custom progress line and product-label plaque.
 
+## Roohafza campaign-feature translation
+
+The supplied reference reinforces the idea of a **large framed campaign card** set within a light neutral stage, with adjacent slivers suggesting a carousel and a compact pagination cue below. For Roohafza, this becomes an original berry-pink campaign chamber above the existing hero: a ticket-like label, a clipped citrus-green side panel, the supplied Berry Bust can, original headline copy, and static progress dots. No source-brand text, vehicle illustration, logo treatment, or source artwork will be reused.
