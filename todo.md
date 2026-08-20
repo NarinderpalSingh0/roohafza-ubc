@@ -65,6 +65,7 @@
 - [x] Publish the verified full-artwork framing update and report the essential Vercel API status within the expedited delivery window.
 - [x] Promote commit e649920 to Vercel Production and confirm the uncropped artwork is live.
 - [x] Adjust Roohafza campaign and can-image framing so full artwork is visible without cropped edges on desktop and mobile.
+- [x] Remove unused campaign-image whitespace with a responsive full-composition layout that remains balanced on phone screens.
 - [x] Add a deployment-focused README with local development, Shopify, and Vercel setup instructions.
 - [x] Review the manus/roohafza-latest versus develop divergence and safely incorporate compatible upstream history without overwriting either branch.
 - [x] Remove undefined Vite analytics placeholders and the non-module analytics script warning from the Vercel build.

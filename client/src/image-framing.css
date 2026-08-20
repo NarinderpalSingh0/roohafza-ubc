@@ -2,12 +2,33 @@
 .campaign-art {
   display: grid;
   place-items: center;
+  isolation: isolate;
+  overflow: hidden;
+  background: #123c35;
+}
+
+.campaign-art::before {
+  position: absolute;
+  z-index: 0;
+  inset: -7%;
+  content: "";
+  background: var(--campaign-image) center / cover no-repeat;
+  filter: blur(22px) saturate(1.15) brightness(0.72);
+  opacity: 0.76;
+  transform: scale(1.08);
+}
+
+.campaign-art::after {
+  z-index: 2;
+  background: linear-gradient(0deg, rgba(10, 8, 9, 0.38), transparent 42%), linear-gradient(90deg, rgba(10, 8, 9, 0.18), transparent 55%);
 }
 
 .campaign-art img {
+  position: relative;
+  z-index: 1;
   object-fit: contain;
   object-position: center;
-  padding: clamp(0.5rem, 1.4vw, 1rem);
+  padding: 0;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -67,7 +88,8 @@
 }
 
 @media (max-width: 700px) {
-  .campaign-art img { padding: 0.5rem; }
+  .campaign-art::before { inset: -10%; filter: blur(16px) saturate(1.1) brightness(0.68); }
+  .campaign-art img { padding: 0; }
   .rooh-hero-product > img { height: clamp(360px, 104vw, 460px); }
   .story-poster img { bottom: 0.75rem; height: min(430px, calc(100% - 2rem)); }
   .newsletter-can { bottom: 0.75rem; height: min(390px, calc(100% - 1.5rem)); }

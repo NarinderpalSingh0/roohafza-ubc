@@ -162,7 +162,7 @@ export default function Home() {
             <div className="campaign-track" style={{ transform: `translateX(-${campaignIndex * 100}%)` }}>
               {campaignSlides.map((slide, index) => (
                 <article className={`campaign-feature ${slide.tone}`} id={`campaign-slide-${index + 1}`} key={slide.handle} aria-hidden={campaignIndex !== index} inert={campaignIndex !== index}>
-                  <div className="campaign-art">
+                  <div className="campaign-art" style={{ "--campaign-image": `url("${slide.image}")` } as CSSProperties}>
                     <img className="campaign-art-media" src={slide.image} alt={slide.alt} />
                     <span className="campaign-art-sidecopy">{slide.imageNote}</span>
                     <span className="campaign-art-caption">{slide.caption}</span>
