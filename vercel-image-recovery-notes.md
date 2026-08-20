@@ -33,3 +33,13 @@ The final repair replaces all `/manus-storage/*` brand asset references with the
 ## Verification
 
 The production site was confirmed to be requesting `/manus-storage/*` paths and displaying broken image regions. The republished wordmark URL was then loaded directly from `files.manuscdn.com` and rendered successfully without a project-specific proxy.
+
+The public CDN repair was pushed to `manus/roohafza-latest` as commit `c40ba48`. The production domain was rechecked immediately after the push and is still serving the previous bundle, so it must be redeployed from the updated commit before live verification can be completed.
+
+## Production promotion
+
+The user approved promotion in their Chrome Vercel session. The `c40ba48` preview deployment was promoted on 20 August 2026, creating Production deployment `5Z2XTftVSyE4EKDAm65gTCBZz3cZ` from the same `manus/roohafza-latest` source commit. At the last check, Vercel was rebuilding it with the Production environment and had not yet reassigned the public alias.
+
+The Production build completed successfully and assigned `roohafza-ubc.vercel.app` to deployment `5Z2XTftVSyE4EKDAm65gTCBZz3cZ`. A live Chrome-session check confirmed that the header wordmark, Rose campaign photograph, and Rose can render correctly on the public site. The broken `/manus-storage/*` image path is no longer used for the Roohafza brand assets.
+
+The captured live production DOM contains all seven expected `files.manuscdn.com` WebP URLs for the wordmark, three can renders, and three campaign photographs. A direct DOM scan found zero `/manus-storage/roohafza-*` references.

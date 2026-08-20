@@ -63,4 +63,8 @@
 - [x] Review the manus/roohafza-latest versus develop divergence and safely incorporate compatible upstream history without overwriting either branch.
 - [x] Remove undefined Vite analytics placeholders and the non-module analytics script warning from the Vercel build.
 - [x] Restore all Roohafza brand and product images on the deployed Vercel site without relying on unavailable server-side storage credentials.
-- [ ] Verify image delivery on the new Vercel production URL: https://roohafza-ubc.vercel.app.
+- [x] Verify image delivery on the new Vercel production URL: https://roohafza-ubc.vercel.app.
+- [x] Promote or alias the completed c40ba48 Vercel deployment to the Roohafza production domain, then verify the public CDN image bundle is live.
+- [x] Inspect the signed-in Vercel deployment record for commit c40ba48 and confirm its production-alias status.
+- [x] Safari promotion path superseded by the completed Chrome-session production promotion.
+- [x] Use the user’s Chrome session to inspect and promote the completed Vercel image-fix deployment.
