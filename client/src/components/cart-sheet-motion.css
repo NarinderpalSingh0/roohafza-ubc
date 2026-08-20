@@ -1,0 +1,27 @@
+@media (prefers-reduced-motion: no-preference) {
+  .cart-sheet {
+    transform-origin: right bottom;
+    animation: rooh-cart-sheet-enter 260ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)) both;
+  }
+
+  .cart-sheet > * {
+    animation: rooh-cart-content-enter 300ms 45ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)) both;
+  }
+}
+
+@keyframes rooh-cart-sheet-enter {
+  from { opacity: 0; transform: translate3d(18px, 10px, 0) scale(0.98); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes rooh-cart-content-enter {
+  from { opacity: 0; transform: translate3d(0, 7px, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cart-sheet,
+  .cart-sheet > * {
+    animation: none;
+  }
+}

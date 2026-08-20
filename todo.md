@@ -67,6 +67,8 @@
 - [x] Fix the deployed locator map so it fills the full map canvas instead of rendering as a narrow column beside unused space.
 - [x] Add a visible, accessible cart option to the site header that opens the existing shopping-cart experience.
 - [x] Refine the spacing around the requested header cart control across desktop and mobile layouts.
+- [x] Add a subtle, reduced-motion-safe opening animation for the cart drawer.
+- [x] Add a compact mobile Shop shortcut that scrolls directly to the live product cards.
 - [x] Commit the bundled `api/index.js` function artifact so Vercel discovers the API route before executing the build command.
 - [x] Publish the verified full-artwork framing update and report the essential Vercel API status within the expedited delivery window.
 - [x] Promote commit e649920 to Vercel Production and confirm the uncropped artwork is live.

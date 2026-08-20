@@ -11,6 +11,7 @@ import "./index.css";
 import "./image-framing.css";
 import "./components/store-locator-full-map.css";
 import "./components/header-cart.css";
+import "./components/cart-sheet-motion.css";
 
 const queryClient = new QueryClient();
 

@@ -48,7 +48,36 @@
   line-height: 1;
 }
 
+.mobile-shop-shortcut {
+  display: none;
+}
+
 @media (max-width: 780px) {
+  .mobile-shop-shortcut {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.22rem;
+    min-height: 2.25rem;
+    margin-left: auto;
+    padding: 0.48rem 0.6rem;
+    border: 1px solid rgba(98, 25, 35, 0.17);
+    border-radius: 999px;
+    background: rgba(255, 250, 239, 0.7);
+    color: #74152a;
+    font: inherit;
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: transform 160ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)), background-color 160ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1));
+  }
+
+  .mobile-shop-shortcut:hover { background: #fffaf0; }
+  .mobile-shop-shortcut:active { transform: scale(0.97); }
+  .mobile-shop-shortcut:focus-visible { outline: 3px solid #cfeb38; outline-offset: 3px; }
+
   .header-cart {
     min-width: 2.35rem;
     margin-inline: 0.1rem 0.16rem;

@@ -154,6 +154,7 @@ export default function Home() {
           {navItems.map(([label, id]) => <button key={id} onClick={() => scrollToId(id)}>{label}</button>)}
         </nav>
         <a className="nav-instagram" href="https://www.instagram.com/roohfza_?utm_source=ig_web_button_share_sheet" target="_blank" rel="noreferrer" aria-label="Visit Roohafza on Instagram"><Instagram size={16} /></a>
+        <button className="mobile-shop-shortcut" type="button" onClick={() => scrollToId("shop")} aria-label="Browse the Roohafza shop">Shop <ArrowDownRight size={13} aria-hidden="true" /></button>
         <button className="header-cart" type="button" onClick={() => { setMenuOpen(false); openCart(); }} aria-label={getShoppingBagLabel(itemCount)}>
           <ShoppingBag size={17} aria-hidden="true" />
           <span>Bag</span>
