@@ -54,3 +54,5 @@
 - [x] Validate the new keyboard and modal interactions, then save a checkpoint.
 - [x] Reconcile duplicate GitHub checklist entries with the verified branch-publication status.
 - [x] Verify manus/roohafza-latest is deployment-ready for Vercel while preserving the existing develop branch.
+- [ ] Add Vercel configuration that installs and builds this project with pnpm rather than npm.
+- [ ] Validate the Vercel-compatible build and push the deployment fix to manus/roohafza-latest.
