@@ -7,3 +7,12 @@
 - [x] Add an accessible interactive store-locator map with search, current-location support, popular-city shortcuts, and nearby retailer handoff.
 - [x] Add a polished newsletter email form with validation, saving, and a success state.
 - [x] Run type, build, and responsive visual checks before delivery.
+- [x] Add a Roohafza shop section with product purchase calls to action.
+- [x] Link the supplied Roohafza Instagram profile in the site’s social navigation and footer.
+- [x] Re-run type, build, and responsive visual checks after the shop update.
+- [x] Register the injected Shopify commerce router and environment exports for the storefront data surface.
+- [x] Build a live Shopify storefront state that replaces retailer-only fallback cards when verified products are published.
+- [x] Publish the initial 330 ml Roohafza cans at ₹99 with the supplied product imagery.
+- [x] Verify the live Shopify catalog can be added to cart and returns a checkout handoff URL.
+- [x] Add the supplied Instagram link to the header-level social navigation.
+- [x] Run a post-shop mobile visual check covering the live catalog, cart controls, and social links.

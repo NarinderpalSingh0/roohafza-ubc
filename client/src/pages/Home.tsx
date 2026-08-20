@@ -4,10 +4,11 @@
  * treated as the hero objects, and bright citrus-green highlights. Keep the energy
  * celebratory and original—never generic beverage catalogue UI.
  */
-import { ArrowDownRight, ArrowUpRight, Check, Menu, MoveUpRight, Sparkles, X } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, Check, Instagram, Menu, MoveUpRight, Sparkles, X } from "lucide-react";
 import { CSSProperties, FormEvent, useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { StoreLocator } from "@/components/StoreLocator";
+import { ShopSection } from "@/components/ShopSection";
 
 const products = [
   {
@@ -92,6 +93,7 @@ export default function Home() {
 
   const navItems = [
     ["The cans", "cans"],
+    ["Shop", "shop"],
     ["Find us", "stores"],
     ["Seasonal drops", "newsletter"],
   ] as const;
@@ -103,9 +105,10 @@ export default function Home() {
         <nav className="rooh-desktop-nav" aria-label="Primary navigation">
           {navItems.map(([label, id]) => <button key={id} onClick={() => scrollToId(id)}>{label}</button>)}
         </nav>
+        <a className="nav-instagram" href="https://www.instagram.com/roohfza_?utm_source=ig_web_button_share_sheet" target="_blank" rel="noreferrer" aria-label="Visit Roohafza on Instagram"><Instagram size={16} /></a>
         <button className="rooh-nav-cta" onClick={() => scrollToId("stores")}>Find a can <ArrowUpRight size={16} /></button>
         <button className="rooh-menu" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-label="Toggle navigation">{menuOpen ? <X size={22} /> : <Menu size={22} />}</button>
-        {menuOpen && <nav className="rooh-mobile-nav" aria-label="Mobile navigation">{navItems.map(([label, id]) => <button key={id} onClick={() => { scrollToId(id); setMenuOpen(false); }}>{label}<ArrowUpRight size={18} /></button>)}</nav>}
+        {menuOpen && <nav className="rooh-mobile-nav" aria-label="Mobile navigation">{navItems.map(([label, id]) => <button key={id} onClick={() => { scrollToId(id); setMenuOpen(false); }}>{label}<ArrowUpRight size={18} /></button>)}<a className="mobile-instagram" href="https://www.instagram.com/roohfza_?utm_source=ig_web_button_share_sheet" target="_blank" rel="noreferrer"><Instagram size={17} />Follow us on Instagram <ArrowUpRight size={17} /></a></nav>}
       </header>
 
       <main id="top">
@@ -145,6 +148,8 @@ export default function Home() {
           <div className="story-copy"><span className="section-kicker"><i />A new kind of familiar</span><h2 id="story-title">The taste of<br /><em>being yourself.</em></h2><p>Roohafza has always known how to colour a moment. These cans bring that familiar warmth into the pace of now—ready when the plan changes, the gang gathers, or the day needs a little lift.</p><div className="story-facts"><span>Bold colour</span><span>Everyday ease</span><span>Designed to share</span></div></div>
         </section>
 
+        <ShopSection />
+
         <StoreLocator />
 
         <section className="newsletter-section section-pad" id="newsletter" aria-labelledby="newsletter-title">
@@ -153,7 +158,7 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="rooh-footer"><div className="footer-brandline"><a href="#top"><img src="/manus-storage/roohafza-wordmark_3d050812.png" alt="Roohafza" /></a><p>For every mood in between.</p><button onClick={() => scrollToId("top")}>Back to top <ArrowUpRight size={16} /></button></div><div className="footer-bottom"><span>© 2026 Roohafza</span><span>Made for bright breaks</span><span>India · English</span></div></footer>
+      <footer className="rooh-footer"><div className="footer-brandline"><a href="#top"><img src="/manus-storage/roohafza-wordmark_3d050812.png" alt="Roohafza" /></a><p>For every mood in between.</p><div className="footer-actions"><a href="https://www.instagram.com/roohfza_?utm_source=ig_web_button_share_sheet" target="_blank" rel="noreferrer"><Instagram size={16} />Instagram</a><button onClick={() => scrollToId("top")}>Back to top <ArrowUpRight size={16} /></button></div></div><div className="footer-bottom"><span>© 2026 Roohafza</span><span>Made for bright breaks</span><span>India · English</span></div></footer>
     </div>
   );
 }
