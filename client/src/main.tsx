@@ -11,6 +11,22 @@ import "./index.css";
 
 const queryClient = new QueryClient();
 
+function loadAnalytics() {
+  const endpoint = import.meta.env.VITE_ANALYTICS_ENDPOINT?.trim().replace(/\/+$/, "");
+  const websiteId = import.meta.env.VITE_ANALYTICS_WEBSITE_ID?.trim();
+
+  if (!endpoint || !websiteId || document.querySelector("script[data-roohafza-analytics]")) return;
+
+  const script = document.createElement("script");
+  script.defer = true;
+  script.src = `${endpoint}/umami`;
+  script.dataset.websiteId = websiteId;
+  script.dataset.roohafzaAnalytics = "true";
+  document.head.appendChild(script);
+}
+
+loadAnalytics();
+
 const redirectToLoginIfUnauthorized = (error: unknown) => {
   if (!(error instanceof TRPCClientError)) return;
   if (typeof window === "undefined") return;

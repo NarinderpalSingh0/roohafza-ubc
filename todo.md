@@ -54,5 +54,13 @@
 - [x] Validate the new keyboard and modal interactions, then save a checkpoint.
 - [x] Reconcile duplicate GitHub checklist entries with the verified branch-publication status.
 - [x] Verify manus/roohafza-latest is deployment-ready for Vercel while preserving the existing develop branch.
-- [ ] Add Vercel configuration that installs and builds this project with pnpm rather than npm.
-- [ ] Validate the Vercel-compatible build and push the deployment fix to manus/roohafza-latest.
+- [x] Add Vercel configuration that installs and builds this project with pnpm rather than npm.
+- [x] Validate the Vercel-compatible build and push the deployment fix to manus/roohafza-latest.
+- [x] Assess and configure the Express+tRPC runtime for Vercel, or document a static-only deployment scope.
+- [x] Verify the configured Vercel deployment can support the required shop, newsletter, and API-backed features.
+- [ ] Confirm the deployed Vercel preview after the required production environment variables are added.
+- [x] Add a deployment-focused README with local development, Shopify, and Vercel setup instructions.
+- [x] Review the manus/roohafza-latest versus develop divergence and safely incorporate compatible upstream history without overwriting either branch.
+- [x] Remove undefined Vite analytics placeholders and the non-module analytics script warning from the Vercel build.
+- [x] Restore all Roohafza brand and product images on the deployed Vercel site without relying on unavailable server-side storage credentials.
+- [ ] Verify image delivery on the new Vercel production URL: https://roohafza-ubc.vercel.app.

@@ -1,5 +1,7 @@
 import React from "react";
 
+import { BRAND_ASSETS } from "./brandAssets";
+
 export const CAMPAIGN_AUTOPLAY_MS = 5600;
 export const CAMPAIGN_AUTOPLAY_ENABLED = true;
 
@@ -10,7 +12,7 @@ export const campaignSlides = [
     label: "Roohafza hydration break",
     eyebrow: "A bright pause, in your hands",
     title: <>A fresh little<br />break for your<br /><em>everyday.</em></>,
-    image: "/manus-storage/roohafza-rose-hydration_c571f84f.jpg",
+    image: BRAND_ASSETS.roseHydration,
     alt: "A Roohafza Rose can held in two hands against a deep green background.",
     caption: <>Rose.<br />In hand.</>,
     imageNote: "Rose + vitamin C · a bright little pause",
@@ -24,7 +26,7 @@ export const campaignSlides = [
     label: "Roohafza table talk",
     eyebrow: "A can for the good company",
     title: <>Pass the plate.<br />Pass the<br /><em>bright side.</em></>,
-    image: "/manus-storage/roohafza-shared-table_910c0fa5.jpg",
+    image: BRAND_ASSETS.sharedTable,
     alt: "Friends sharing Roohafza cans across a table with a Straberry can in front.",
     caption: <>Straberry.<br />Share it.</>,
     imageNote: "Straberry + zinc · made for the table",
@@ -38,7 +40,7 @@ export const campaignSlides = [
     label: "Roohafza living room drop",
     eyebrow: "When the whole gang is in",
     title: <>Turn the chill<br />into a<br /><em>bright break.</em></>,
-    image: "/manus-storage/roohafza-shared-lounge_7f55cc1b.jpg",
+    image: BRAND_ASSETS.sharedLounge,
     alt: "Friends gathered around a green sofa holding a Roohafza Berry Bust can.",
     caption: <>Berry Bust.<br />Bring the gang.</>,
     imageNote: "Berry Bust + antioxidants · chill with the crew",
