@@ -66,6 +66,9 @@
 - [x] Promote commit e649920 to Vercel Production and confirm the uncropped artwork is live.
 - [x] Adjust Roohafza campaign and can-image framing so full artwork is visible without cropped edges on desktop and mobile.
 - [x] Remove unused campaign-image whitespace with a responsive full-composition layout that remains balanced on phone screens.
+- [x] Retain the user-preferred colour-filled campaign surround while preserving the full image and mobile balance.
+- [x] Replace the blurred photo fill with a premium solid brand-colour campaign surround.
+- [ ] Verify the final solid-colour campaign treatment and its Production deployment through the user’s browser session.
 - [x] Add a deployment-focused README with local development, Shopify, and Vercel setup instructions.
 - [x] Review the manus/roohafza-latest versus develop divergence and safely incorporate compatible upstream history without overwriting either branch.
 - [x] Remove undefined Vite analytics placeholders and the non-module analytics script warning from the Vercel build.
