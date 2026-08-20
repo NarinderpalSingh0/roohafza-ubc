@@ -1,19 +1,14 @@
-import { Clock3, ExternalLink, List, LocateFixed, Map as MapIcon, Navigation, Phone, Search, Store, LoaderCircle } from "lucide-react";
+import { Clock3, ExternalLink, Heart, HeartOff, List, LocateFixed, Map as MapIcon, Navigation, Phone, Search, Store, LoaderCircle } from "lucide-react";
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MapView } from "@/components/Map";
 import { createDirectionsUrl, formatRetailerHours } from "@/lib/retailerResults";
+import { persistSavedRetailers, readSavedRetailers, SavedRetailer, toggleSavedRetailer } from "@/lib/savedRetailers";
 import "./store-locator-full-map.css";
+import "./saved-retailer.css";
 
 type MapCenter = { label: string; lat: number; lng: number };
 
-type RetailerResult = {
-  id: string;
-  name: string;
-  address: string;
-  phone?: string;
-  todayHours?: string;
-  directionsUrl: string;
-};
+type RetailerResult = SavedRetailer;
 
 const popularAreas: MapCenter[] = [
   { label: "Delhi", lat: 28.6139, lng: 77.209 },
@@ -21,6 +16,10 @@ const popularAreas: MapCenter[] = [
   { label: "Lucknow", lat: 26.8467, lng: 80.9462 },
   { label: "Hyderabad", lat: 17.385, lng: 78.4867 },
 ];
+
+function toMapBounds(lat: number, lng: number, spread = 0.24) {
+  return `${lng - spread},${lat - spread},${lng + spread},${lat + spread}`;
+}
 
 function toRetailerResult(place: google.maps.places.PlaceResult): RetailerResult | null {
   if (!place.name || !place.geometry?.location) return null;
@@ -42,11 +41,17 @@ export function StoreLocator() {
   const [mapCenter, setMapCenter] = useState<MapCenter>(popularAreas[0]);
   const [status, setStatus] = useState("Search a city or PIN code to explore nearby retailers.");
   const [retailers, setRetailers] = useState<RetailerResult[]>([]);
+  const [savedRetailers, setSavedRetailers] = useState<SavedRetailer[]>([]);
   const [retailerLoading, setRetailerLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [mobileView, setMobileView] = useState<"map" | "list">("map");
+  const [mapsSdkReady, setMapsSdkReady] = useState(false);
   const mapRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
+
+  useEffect(() => {
+    setSavedRetailers(readSavedRetailers(window.localStorage));
+  }, []);
 
   const clearMarkers = useCallback(() => {
     markersRef.current.forEach((marker) => marker.setMap(null));
@@ -164,6 +169,7 @@ export function StoreLocator() {
 
   const handleMapReady = useCallback((map: google.maps.Map) => {
     mapRef.current = map;
+    setMapsSdkReady(true);
     if (hasSearched) lookupRetailers(mapCenter, map);
   }, [hasSearched, lookupRetailers, mapCenter]);
 
@@ -171,7 +177,20 @@ export function StoreLocator() {
     if (hasSearched && mapRef.current) lookupRetailers(mapCenter);
   }, [hasSearched, lookupRetailers, mapCenter]);
 
+  const toggleRetailerSave = (retailer: SavedRetailer) => {
+    const wasSaved = savedRetailers.some((saved) => saved.id === retailer.id);
+    const updated = toggleSavedRetailer(savedRetailers, retailer);
+    setSavedRetailers(updated);
+    persistSavedRetailers(window.localStorage, updated);
+    setStatus(wasSaved ? `${retailer.name} was removed from your saved retailers.` : `${retailer.name} is saved for your next visit.`);
+  };
+
   const mapsQuery = useMemo(() => encodeURIComponent(`Roohafza cans near ${location.trim() || mapCenter.label}`), [location, mapCenter.label]);
+  const fallbackMapSrc = useMemo(() => {
+    const bbox = encodeURIComponent(toMapBounds(mapCenter.lat, mapCenter.lng));
+    const marker = encodeURIComponent(`${mapCenter.lat},${mapCenter.lng}`);
+    return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${marker}`;
+  }, [mapCenter]);
 
   return (
     <section className="locator-section section-pad" id="stores" aria-labelledby="locator-title">
@@ -185,7 +204,8 @@ export function StoreLocator() {
 
       <div className="locator-layout">
         <div className={`map-frame map-frame--full${mobileView === "list" ? " is-list-view" : ""}`}>
-          <MapView className="roohafza-map" initialCenter={{ lat: mapCenter.lat, lng: mapCenter.lng }} initialZoom={12} onMapReady={handleMapReady} />
+          <iframe className={`roohafza-map-fallback${mapsSdkReady ? " is-covered" : ""}`} src={fallbackMapSrc} title="Map for the Roohafza store locator" loading="lazy" />
+          <MapView className={`roohafza-map${mapsSdkReady ? " is-ready" : ""}`} initialCenter={{ lat: mapCenter.lat, lng: mapCenter.lng }} initialZoom={12} onMapReady={handleMapReady} />
           <div className="map-caption"><span>Roohafza Locator</span><b>Explore {mapCenter.label}</b></div>
           <div className="mobile-locator-toggle" role="group" aria-label="Choose store locator view">
             <button type="button" className={mobileView === "map" ? "is-active" : ""} aria-pressed={mobileView === "map"} onClick={() => setMobileView("map")}><MapIcon size={14} />Map</button>
@@ -207,16 +227,30 @@ export function StoreLocator() {
               <div>{popularAreas.map((area) => <button key={area.label} type="button" onClick={() => setPopularArea(area)}>{area.label}</button>)}</div>
             </div>
             <p className="locator-status" aria-live="polite">{status}</p>
+            {savedRetailers.length > 0 && <section className="saved-retailers" aria-label="Saved retailers">
+              <div className="saved-retailers-heading"><Heart size={14} fill="currentColor" /><span>Saved for later</span></div>
+              <div className="saved-retailer-list">
+                {savedRetailers.map((retailer) => <article className="saved-retailer-card" key={retailer.id}>
+                  <h4>{retailer.name}</h4>
+                  <button className="retailer-save is-saved" type="button" onClick={() => toggleRetailerSave(retailer)} aria-label={`Remove ${retailer.name} from saved retailers`}><HeartOff size={13} />Remove</button>
+                  <p>{retailer.address}</p>
+                  <div className="saved-retailer-actions"><a className="saved-retailer-directions" href={retailer.directionsUrl} target="_blank" rel="noreferrer"><Navigation size={13} />Directions <ExternalLink size={12} /></a></div>
+                </article>)}
+              </div>
+            </section>}
             {retailerLoading && <div className="retailer-loading" role="status"><LoaderCircle size={16} />Finding nearby retailers…</div>}
             {!retailerLoading && retailers.length > 0 && <section className="retailer-results" aria-label={`Nearby retailers around ${mapCenter.label}`}>
               <div className="retailer-results-heading"><span>Nearby retailers</span><b>{retailers.length}</b></div>
               <div className="retailer-card-list">
-                {retailers.map((retailer) => <article className="retailer-card" key={retailer.id}>
-                  <div className="retailer-card-title"><Store size={15} /><h4>{retailer.name}</h4></div>
+                {retailers.map((retailer) => {
+                  const isSaved = savedRetailers.some((saved) => saved.id === retailer.id);
+                  return <article className="retailer-card" key={retailer.id}>
+                  <div className="retailer-card-title"><Store size={15} /><h4>{retailer.name}</h4><button className={`retailer-save${isSaved ? " is-saved" : ""}`} type="button" onClick={() => toggleRetailerSave(retailer)} aria-pressed={isSaved} aria-label={`${isSaved ? "Remove" : "Save"} ${retailer.name} ${isSaved ? "from" : "to"} saved retailers`}><Heart size={13} fill={isSaved ? "currentColor" : "none"} />{isSaved ? "Saved" : "Save"}</button></div>
                   <p>{retailer.address}</p>
                   <div className="retailer-meta"><span><Clock3 size={13} />{retailer.todayHours}</span>{retailer.phone ? <a href={`tel:${retailer.phone.replace(/\s+/g, "")}`}><Phone size={13} />{retailer.phone}</a> : <span><Phone size={13} />Contact not published</span>}</div>
                   <a className="retailer-directions" href={retailer.directionsUrl} target="_blank" rel="noreferrer"><Navigation size={14} />Directions <ExternalLink size={13} /></a>
-                </article>)}
+                </article>;
+                })}
               </div>
             </section>}
             <a className="maps-link" href={`https://www.google.com/maps/search/?api=1&query=${mapsQuery}`} target="_blank" rel="noreferrer">Open broader retailer search <ExternalLink size={15} /></a>

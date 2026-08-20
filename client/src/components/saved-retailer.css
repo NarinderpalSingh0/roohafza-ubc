@@ -1,0 +1,79 @@
+.saved-retailers {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 248, 235, 0.16);
+}
+
+.saved-retailers-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.65rem;
+  color: #cfeb38;
+}
+
+.saved-retailers-heading span {
+  color: #fff8eb;
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.saved-retailer-list { display: grid; gap: 0.5rem; }
+
+.saved-retailer-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.45rem 0.65rem;
+  padding: 0.7rem;
+  border: 1px solid rgba(207, 235, 56, 0.28);
+  border-radius: 0.75rem;
+  background: rgba(207, 235, 56, 0.07);
+}
+
+.saved-retailer-card h4 {
+  margin: 0;
+  color: #fff8eb;
+  font-family: "DM Serif Display", serif;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+.saved-retailer-card p {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: rgba(255, 248, 235, 0.68);
+  font-size: 0.64rem;
+  line-height: 1.42;
+}
+
+.retailer-save {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  width: fit-content;
+  min-height: 1.9rem;
+  padding: 0.35rem 0.52rem;
+  border: 1px solid rgba(255, 248, 235, 0.22);
+  border-radius: 99px;
+  background: transparent;
+  color: rgba(255, 248, 235, 0.78);
+  font: inherit;
+  font-size: 0.58rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 160ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)), background-color 160ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1)), color 160ms var(--ease-out, cubic-bezier(0.23, 1, 0.32, 1));
+}
+
+.retailer-save:hover { transform: translateY(-1px); }
+.retailer-save:active { transform: scale(0.97); }
+.retailer-save:focus-visible { outline: 2px solid #cfeb38; outline-offset: 2px; }
+.retailer-save.is-saved { border-color: #cfeb38; background: #cfeb38; color: #23120f; }
+
+.saved-retailer-actions { display: flex; align-items: center; gap: 0.45rem; }
+.saved-retailer-directions { display: inline-flex; align-items: center; gap: 0.28rem; color: #cfeb38; font-size: 0.6rem; font-weight: 800; }
