@@ -37,3 +37,8 @@
 - [x] Add swipe gestures to navigate the carousel on touch devices.
 - [x] Add subtle can movement to the campaign imagery while respecting reduced-motion preferences.
 - [x] Validate the enhanced carousel on desktop and mobile, then save a checkpoint.
+- [x] Sync the development preview with the latest shared project version.
+- [x] Add accessible shop filters for flavor and available can sizes.
+- [x] Add quick-add feedback with a success toast after a can enters the cart.
+- [x] Add reduced-motion-safe 3D tilt or floating motion to shop can cards.
+- [x] Test the upgraded shop experience on desktop and mobile, then save a checkpoint.
