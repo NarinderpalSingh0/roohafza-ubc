@@ -1,15 +1,18 @@
-.locator-layout {
-  display: block;
+.locator-section .locator-layout {
+  display: block !important;
+  width: 100% !important;
   margin-top: 3.25rem;
 }
 
-.map-frame.map-frame--full {
+.locator-section .map-frame.map-frame--full {
+  display: block !important;
+  width: 100% !important;
   min-height: 620px;
   border-radius: 1.5rem;
   box-shadow: 0 20px 44px rgba(35, 18, 15, 0.16);
 }
 
-.map-frame--full .roohafza-map {
+.locator-section .map-frame--full .roohafza-map {
   display: block;
   width: 100%;
   height: 620px !important;
@@ -41,9 +44,9 @@
 }
 
 @media (max-width: 700px) {
-  .locator-layout { margin-top: 2rem; }
-  .map-frame.map-frame--full { min-height: 670px; border-radius: 1.2rem; }
-  .map-frame--full .roohafza-map { height: 670px !important; }
+  .locator-section .locator-layout { margin-top: 2rem; }
+  .locator-section .map-frame.map-frame--full { min-height: 670px; border-radius: 1.2rem; }
+  .locator-section .map-frame--full .roohafza-map { height: 670px !important; }
   .locator-panel.locator-panel--overlay {
     top: auto;
     right: 0.75rem;

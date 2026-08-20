@@ -4,13 +4,15 @@
  * treated as the hero objects, and bright citrus-green highlights. Keep the energy
  * celebratory and original—never generic beverage catalogue UI.
  */
-import { ArrowDownRight, ArrowUpRight, Check, ChevronLeft, ChevronRight, Info, Instagram, Menu, MoveUpRight, Sparkles, X } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, Check, ChevronLeft, ChevronRight, Info, Instagram, Menu, MoveUpRight, ShoppingBag, Sparkles, X } from "lucide-react";
 import { CSSProperties, FormEvent, useEffect, useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { StoreLocator } from "@/components/StoreLocator";
 import { ShopSection } from "@/components/ShopSection";
+import { useCart } from "@/contexts/CartContext";
 import { CAMPAIGN_AUTOPLAY_ENABLED, CAMPAIGN_AUTOPLAY_MS, campaignSlides, getCampaignIndexForKey, getCampaignShopTarget, getNextCampaignIndex, getPreviousCampaignIndex, getRelatedCampaignSlides } from "@/data/campaignSlides";
 import { BRAND_ASSETS } from "@/data/brandAssets";
+import { getShoppingBagLabel } from "@/lib/cartLabel";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const products = [
@@ -77,6 +79,7 @@ function ProductCard({ product, index }: { product: (typeof products)[number]; i
 }
 
 export default function Home() {
+  const { itemCount, openCart } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
@@ -151,6 +154,11 @@ export default function Home() {
           {navItems.map(([label, id]) => <button key={id} onClick={() => scrollToId(id)}>{label}</button>)}
         </nav>
         <a className="nav-instagram" href="https://www.instagram.com/roohfza_?utm_source=ig_web_button_share_sheet" target="_blank" rel="noreferrer" aria-label="Visit Roohafza on Instagram"><Instagram size={16} /></a>
+        <button className="header-cart" type="button" onClick={() => { setMenuOpen(false); openCart(); }} aria-label={getShoppingBagLabel(itemCount)}>
+          <ShoppingBag size={17} aria-hidden="true" />
+          <span>Bag</span>
+          {itemCount > 0 && <b aria-hidden="true">{itemCount}</b>}
+        </button>
         <button className="rooh-nav-cta" onClick={() => scrollToId("stores")}>Find a can <ArrowUpRight size={16} /></button>
         <button className="rooh-menu" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-label="Toggle navigation">{menuOpen ? <X size={22} /> : <Menu size={22} />}</button>
         {menuOpen && <nav className="rooh-mobile-nav" aria-label="Mobile navigation">{navItems.map(([label, id]) => <button key={id} onClick={() => { scrollToId(id); setMenuOpen(false); }}>{label}<ArrowUpRight size={18} /></button>)}<a className="mobile-instagram" href="https://www.instagram.com/roohfza_?utm_source=ig_web_button_share_sheet" target="_blank" rel="noreferrer"><Instagram size={17} />Follow us on Instagram <ArrowUpRight size={17} /></a></nav>}

@@ -9,6 +9,8 @@ import { startLogin } from "./const";
 import { CartProvider } from "./contexts/CartContext";
 import "./index.css";
 import "./image-framing.css";
+import "./components/store-locator-full-map.css";
+import "./components/header-cart.css";
 
 const queryClient = new QueryClient();
 
