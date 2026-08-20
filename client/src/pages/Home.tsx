@@ -19,14 +19,14 @@ const products = [
     className: "berry",
   },
   {
-    name: "Na Chalan",
+    name: "Straberry",
     subline: "A strawberry-forward sip",
     note: "Big warmth, sharp mood.",
     image: "/manus-storage/roohafza-no-chalan_ef606d6d.png",
     className: "red",
   },
   {
-    name: "Naam Rakh Lena",
+    name: "Rose",
     subline: "A rose-coloured moment",
     note: "Soft, fragrant, memorable.",
     image: "/manus-storage/roohafza-nam-rakh-lena_8d4ce84b.png",
@@ -144,8 +144,8 @@ export default function Home() {
         </section>
 
         <section className="story-section section-pad" id="story" aria-labelledby="story-title">
-          <div className="story-poster"><div className="story-circle" /><img src="/manus-storage/roohafza-no-chalan_ef606d6d.png" alt="Roohafza Na Chalan can" /><span>Too cool<br />to rush.</span></div>
-          <div className="story-copy"><span className="section-kicker"><i />A new kind of familiar</span><h2 id="story-title">The taste of<br /><em>being yourself.</em></h2><p>Roohafza has always known how to colour a moment. These cans bring that familiar warmth into the pace of now—ready when the plan changes, the gang gathers, or the day needs a little lift.</p><div className="story-facts"><span>Bold colour</span><span>Everyday ease</span><span>Designed to share</span></div></div>
+          <div className="story-poster"><div className="story-circle" /><img src="/manus-storage/roohafza-no-chalan_ef606d6d.png" alt="Roohafza Straberry can" /><span>Too cool<br />to rush.</span></div>
+          <div className="story-copy"><span className="section-kicker"><i />A new kind of familiar</span><h2 id="story-title">The taste of<br /><em>being yourself.</em></h2><p>Roohafza has always known how to colour a moment. These cans bring that familiar warmth into the pace of now—ready when the plan changes, the gang gathers, or the day needs a little lift.</p><div className="story-facts"><span>Bold colour</span><span>Everyday ease</span><span>Designed to share</span></div><div className="story-mood-bar" aria-label="Your mood. Your can."><span>Your mood.</span><b>✦</b><span>Your can.</span></div></div>
         </section>
 
         <ShopSection />
@@ -153,7 +153,7 @@ export default function Home() {
         <StoreLocator />
 
         <section className="newsletter-section section-pad" id="newsletter" aria-labelledby="newsletter-title">
-          <div className="newsletter-art"><div className="newsletter-flower">✦</div><div className="newsletter-can"><img src="/manus-storage/roohafza-nam-rakh-lena_8d4ce84b.png" alt="Roohafza Naam Rakh Lena can" /></div></div>
+          <div className="newsletter-art"><div className="newsletter-flower">✦</div><div className="newsletter-can"><img src="/manus-storage/roohafza-nam-rakh-lena_8d4ce84b.png" alt="Roohafza Rose can" /></div></div>
           <div className="newsletter-copy"><span className="section-kicker light"><i />Seasonal drops</span><h2 id="newsletter-title">Be first to<br />catch the <em>feeling.</em></h2><p>New flavours, fresh artwork, and the next little reason to open something bright.</p>{subscribed ? <div className="newsletter-success" role="status"><Check size={18} />You’re on the list. See you at the next drop.</div> : <form className="newsletter-form" onSubmit={handleNewsletter}><label htmlFor="newsletter-email">Your email address</label><div><input id="newsletter-email" type="email" value={email} required onChange={(event) => setEmail(event.target.value)} placeholder="you@example.com" /><button type="submit" disabled={newsletter.isPending}>{newsletter.isPending ? "Joining…" : "Keep me posted"}<ArrowUpRight size={17} /></button></div>{newsletter.error && <p className="newsletter-error" role="alert">{newsletter.error.message}</p>}</form>}<small>By joining, you agree to receive Roohafza launch updates. You can unsubscribe anytime.</small></div>
         </section>
       </main>

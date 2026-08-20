@@ -20,3 +20,7 @@
 - [x] Verify the live shop catalogue after the copy revision and save a checkpoint.
 - [x] Replace the hero callout wording with “make your health worth enjoying” and increase its width.
 - [x] Verify the revised hero callout visually and save a checkpoint.
+- [x] Review the annotated home-page containers and document their purpose for the user.
+- [x] Rename the home-page flavor cards from Na Chalan and Naam Rakh Lena to Straberry and Rose.
+- [x] Add a “Your mood. Your can.” campaign bar to the home page.
+- [x] Validate the revised home page and save a checkpoint.
