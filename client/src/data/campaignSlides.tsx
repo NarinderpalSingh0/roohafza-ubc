@@ -49,6 +49,10 @@ export function getNextCampaignIndex(currentIndex: number) {
   return (currentIndex + 1) % campaignSlides.length;
 }
 
+export function getPreviousCampaignIndex(currentIndex: number) {
+  return (currentIndex - 1 + campaignSlides.length) % campaignSlides.length;
+}
+
 export function getCampaignShopTarget(handle: string) {
   return `shop-${handle}`;
 }

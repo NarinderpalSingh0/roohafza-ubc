@@ -33,3 +33,7 @@
 - [x] Add clear supporting copy on the carousel image side for each lifestyle slide.
 - [x] Make carousel auto-play active by default while preserving the visitor pause control.
 - [x] Validate the refined carousel across desktop and mobile, then save a checkpoint.
+- [x] Add a visible countdown progress bar that resets with each active carousel slide.
+- [x] Add swipe gestures to navigate the carousel on touch devices.
+- [x] Add subtle can movement to the campaign imagery while respecting reduced-motion preferences.
+- [x] Validate the enhanced carousel on desktop and mobile, then save a checkpoint.

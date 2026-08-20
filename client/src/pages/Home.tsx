@@ -9,7 +9,7 @@ import { CSSProperties, FormEvent, useEffect, useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { StoreLocator } from "@/components/StoreLocator";
 import { ShopSection } from "@/components/ShopSection";
-import { CAMPAIGN_AUTOPLAY_ENABLED, CAMPAIGN_AUTOPLAY_MS, campaignSlides, getCampaignShopTarget, getNextCampaignIndex } from "@/data/campaignSlides";
+import { CAMPAIGN_AUTOPLAY_ENABLED, CAMPAIGN_AUTOPLAY_MS, campaignSlides, getCampaignShopTarget, getNextCampaignIndex, getPreviousCampaignIndex } from "@/data/campaignSlides";
 
 const products = [
   {
@@ -81,6 +81,7 @@ export default function Home() {
   const [heroShift, setHeroShift] = useState({ x: 0, y: 0 });
   const [campaignIndex, setCampaignIndex] = useState(0);
   const [campaignPaused, setCampaignPaused] = useState(!CAMPAIGN_AUTOPLAY_ENABLED);
+  const [campaignTouchStart, setCampaignTouchStart] = useState<number | null>(null);
   const newsletter = trpc.newsletter.subscribe.useMutation({
     onSuccess: () => {
       setSubscribed(true);
@@ -111,6 +112,15 @@ export default function Home() {
     productCard?.scrollIntoView({ behavior: "smooth", block: "center" });
   };
 
+  const finishCampaignSwipe = (clientX: number) => {
+    if (campaignTouchStart === null) return;
+    const distance = clientX - campaignTouchStart;
+    setCampaignTouchStart(null);
+    if (Math.abs(distance) < 44) return;
+    setCampaignPaused(true);
+    setCampaignIndex(distance < 0 ? getNextCampaignIndex : getPreviousCampaignIndex);
+  };
+
   const navItems = [
     ["The cans", "cans"],
     ["Shop", "shop"],
@@ -133,12 +143,12 @@ export default function Home() {
 
       <main id="top">
         <section className="campaign-stage section-pad" aria-label="Roohafza campaign carousel" onFocusCapture={() => setCampaignPaused(true)}>
-          <div className="campaign-viewport" role="region" aria-roledescription="carousel" aria-label="Roohafza campaign stories">
+          <div className="campaign-viewport" role="region" aria-roledescription="carousel" aria-label="Roohafza campaign stories" onTouchStart={(event) => setCampaignTouchStart(event.touches[0]?.clientX ?? null)} onTouchEnd={(event) => finishCampaignSwipe(event.changedTouches[0]?.clientX ?? 0)}>
             <div className="campaign-track" style={{ transform: `translateX(-${campaignIndex * 100}%)` }}>
               {campaignSlides.map((slide, index) => (
                 <article className={`campaign-feature ${slide.tone}`} id={`campaign-slide-${index + 1}`} key={slide.handle} aria-hidden={campaignIndex !== index} inert={campaignIndex !== index}>
                   <div className="campaign-art">
-                    <img src={slide.image} alt={slide.alt} />
+                    <img className="campaign-art-media" src={slide.image} alt={slide.alt} />
                     <span className="campaign-art-sidecopy">{slide.imageNote}</span>
                     <span className="campaign-art-caption">{slide.caption}</span>
                   </div>
@@ -155,6 +165,7 @@ export default function Home() {
             </div>
           </div>
           <div className="campaign-controls">
+            <div className={`campaign-progress${campaignPaused ? " is-paused" : ""}`} style={{ "--campaign-duration": `${CAMPAIGN_AUTOPLAY_MS}ms` } as CSSProperties} aria-label={campaignPaused ? "Carousel timing paused" : "Next carousel slide progress"}><span key={campaignIndex} /></div>
             <div className="campaign-dots" role="tablist" aria-label="Choose a Roohafza campaign story">
               {campaignSlides.map((slide, index) => <button type="button" key={slide.handle} role="tab" aria-selected={campaignIndex === index} aria-controls={`campaign-slide-${index + 1}`} aria-label={`Show ${slide.flavor} campaign`} className={campaignIndex === index ? "is-active" : ""} onClick={() => showCampaign(index)} />)}
             </div>

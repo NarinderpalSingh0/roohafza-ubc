@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CAMPAIGN_AUTOPLAY_ENABLED, CAMPAIGN_AUTOPLAY_MS, campaignSlides, getCampaignShopTarget, getNextCampaignIndex } from "../client/src/data/campaignSlides";
+import { CAMPAIGN_AUTOPLAY_ENABLED, CAMPAIGN_AUTOPLAY_MS, campaignSlides, getCampaignShopTarget, getNextCampaignIndex, getPreviousCampaignIndex } from "../client/src/data/campaignSlides";
 
 describe("campaign carousel configuration", () => {
   it("defines three distinct campaign slides with matching published shop handles", () => {
@@ -21,6 +21,8 @@ describe("campaign carousel configuration", () => {
     expect(getNextCampaignIndex(0)).toBe(1);
     expect(getNextCampaignIndex(1)).toBe(2);
     expect(getNextCampaignIndex(2)).toBe(0);
+    expect(getPreviousCampaignIndex(0)).toBe(2);
+    expect(getPreviousCampaignIndex(2)).toBe(1);
     expect(campaignSlides.map(slide => getCampaignShopTarget(slide.handle))).toEqual([
       "shop-roohafza-rose-330ml",
       "shop-roohafza-straberry-330ml",
