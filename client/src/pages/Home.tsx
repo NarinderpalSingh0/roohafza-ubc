@@ -4,12 +4,13 @@
  * treated as the hero objects, and bright citrus-green highlights. Keep the energy
  * celebratory and original—never generic beverage catalogue UI.
  */
-import { ArrowDownRight, ArrowUpRight, Check, Instagram, Menu, MoveUpRight, Sparkles, X } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, Check, ChevronLeft, ChevronRight, Info, Instagram, Menu, MoveUpRight, Sparkles, X } from "lucide-react";
 import { CSSProperties, FormEvent, useEffect, useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { StoreLocator } from "@/components/StoreLocator";
 import { ShopSection } from "@/components/ShopSection";
 import { CAMPAIGN_AUTOPLAY_ENABLED, CAMPAIGN_AUTOPLAY_MS, campaignSlides, getCampaignShopTarget, getNextCampaignIndex, getPreviousCampaignIndex } from "@/data/campaignSlides";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const products = [
   {
@@ -82,6 +83,7 @@ export default function Home() {
   const [campaignIndex, setCampaignIndex] = useState(0);
   const [campaignPaused, setCampaignPaused] = useState(!CAMPAIGN_AUTOPLAY_ENABLED);
   const [campaignTouchStart, setCampaignTouchStart] = useState<number | null>(null);
+  const [activeFlavorDetail, setActiveFlavorDetail] = useState<(typeof campaignSlides)[number] | null>(null);
   const newsletter = trpc.newsletter.subscribe.useMutation({
     onSuccess: () => {
       setSubscribed(true);
@@ -110,6 +112,11 @@ export default function Home() {
     setCampaignPaused(true);
     const productCard = document.getElementById(getCampaignShopTarget(handle)) ?? document.getElementById("shop");
     productCard?.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
+
+  const openFlavorDetail = (slide: (typeof campaignSlides)[number]) => {
+    setCampaignPaused(true);
+    setActiveFlavorDetail(slide);
   };
 
   const finishCampaignSwipe = (clientX: number) => {
@@ -156,12 +163,16 @@ export default function Home() {
                     <span className="campaign-ticket">{slide.label}</span>
                     <p className="campaign-eyebrow">{slide.eyebrow}</p>
                     <h2>{slide.title}</h2>
-                    <button className="campaign-cta" type="button" onClick={() => openCampaignProduct(slide.handle)}>Shop {slide.flavor} <ArrowDownRight size={17} /></button>
+                    <button className="campaign-cta" type="button" onClick={() => openFlavorDetail(slide)}>Meet {slide.flavor} <Info size={16} /></button>
                     <span className="campaign-legal">330 ml of bright breaks · ₹99 each</span>
                   </div>
                   <div className="campaign-footer"><span>Roohafza · your mood, your can</span><b>✦</b><span>{slide.footer}</span></div>
                 </article>
               ))}
+            </div>
+            <div className="campaign-arrow-controls" aria-label="Campaign carousel controls">
+              <button className="campaign-arrow campaign-arrow-prev" type="button" aria-label="Previous campaign story" onClick={() => { setCampaignPaused(true); setCampaignIndex(getPreviousCampaignIndex); }}><ChevronLeft size={22} /></button>
+              <button className="campaign-arrow campaign-arrow-next" type="button" aria-label="Next campaign story" onClick={() => { setCampaignPaused(true); setCampaignIndex(getNextCampaignIndex); }}><ChevronRight size={22} /></button>
             </div>
           </div>
           <div className="campaign-controls">
@@ -172,6 +183,12 @@ export default function Home() {
             <button className="campaign-autoplay-toggle" type="button" onClick={() => setCampaignPaused((paused) => !paused)} aria-label={campaignPaused ? "Play campaign carousel" : "Pause campaign carousel"}>{campaignPaused ? "Play stories" : "Pause stories"}</button>
           </div>
         </section>
+        <Dialog open={Boolean(activeFlavorDetail)} onOpenChange={(open) => { if (!open) setActiveFlavorDetail(null); }}>
+          {activeFlavorDetail && <DialogContent className="flavor-detail-dialog" showCloseButton={false}>
+            <div className="flavor-detail-image"><img src={activeFlavorDetail.image} alt={activeFlavorDetail.alt} /></div>
+            <div className="flavor-detail-copy"><DialogHeader><span className="section-kicker"><i />Roohafza flavor note</span><DialogTitle>{activeFlavorDetail.flavor}</DialogTitle><DialogDescription>{activeFlavorDetail.detail}</DialogDescription></DialogHeader><div className="flavor-detail-meta"><span>330 ml can</span><span>₹99</span><span>No campaign code needed</span></div><DialogFooter><DialogClose asChild><button className="flavor-detail-dismiss" type="button">Keep browsing</button></DialogClose><button className="flavor-detail-shop" type="button" onClick={() => { openCampaignProduct(activeFlavorDetail.handle); setActiveFlavorDetail(null); }}>Shop {activeFlavorDetail.flavor} <ArrowDownRight size={16} /></button></DialogFooter></div>
+          </DialogContent>}
+        </Dialog>
         <section className="rooh-hero section-pad" aria-labelledby="hero-title">
           <div className="hero-waves" aria-hidden="true"><i /><i /><i /></div>
           <div className="rooh-hero-copy">

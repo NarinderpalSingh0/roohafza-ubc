@@ -10,6 +10,7 @@ describe("campaign carousel configuration", () => {
       "roohafza-berry-bust-330ml",
     ]);
     expect(new Set(campaignSlides.map(slide => slide.image)).size).toBe(3);
+    expect(campaignSlides.every(slide => slide.detail.length > 30)).toBe(true);
   });
 
   it("uses a positive auto-play interval", () => {

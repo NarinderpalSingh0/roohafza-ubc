@@ -42,3 +42,7 @@
 - [x] Add quick-add feedback with a success toast after a can enters the cart.
 - [x] Add reduced-motion-safe 3D tilt or floating motion to shop can cards.
 - [x] Test the upgraded shop experience on desktop and mobile, then save a checkpoint.
+- [x] Add visible left and right arrow controls to the desktop campaign carousel.
+- [x] Add an accessible flavor-detail modal opened from each campaign CTA.
+- [x] Preserve a deferred campaign-discount-code placeholder without inventing codes.
+- [x] Validate the carousel controls and modal across desktop and mobile, then save a checkpoint.
