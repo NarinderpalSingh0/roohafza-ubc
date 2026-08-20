@@ -16,3 +16,7 @@
 - [x] Verify the live Shopify catalog can be added to cart and returns a checkout handoff URL.
 - [x] Add the supplied Instagram link to the header-level social navigation.
 - [x] Run a post-shop mobile visual check covering the live catalog, cart controls, and social links.
+- [x] Update the Roohafza shop titles and descriptions to the requested Berry Bust, Straberry, and Rose wording.
+- [x] Verify the live shop catalogue after the copy revision and save a checkpoint.
+- [x] Replace the hero callout wording with “make your health worth enjoying” and increase its width.
+- [x] Verify the revised hero callout visually and save a checkpoint.

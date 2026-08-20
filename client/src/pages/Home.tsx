@@ -131,7 +131,7 @@ export default function Home() {
             <div className="hero-petal petal-a" /><div className="hero-petal petal-b" /><div className="hero-petal petal-c" />
             <img src="/manus-storage/roohafza-berry-bust_52910888.png" alt="Roohafza Berry Bust can" style={{ transform: `translate3d(${heroShift.x}px, ${heroShift.y}px, 0) rotate(${heroShift.x * .18}deg)` }} />
             <div className="hero-sticker"><Sparkles size={17} /><span>Har sip<br />ek feeling</span></div>
-            <div className="hero-product-note"><span>Berry Bust</span><b>WORTH<br />THE<br />MOOD.</b></div>
+            <div className="hero-product-note"><span>Berry Bust</span><b>make your<br />health worth<br />enjoying</b></div>
           </div>
         </section>
 

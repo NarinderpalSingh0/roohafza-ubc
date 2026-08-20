@@ -6,9 +6,9 @@ import { formatMoney } from "@/lib/format";
 import { trpc } from "@/lib/trpc";
 
 const previewCans = [
-  { title: "Berry Bust", note: "Berry-forward and bright.", image: "/manus-storage/roohafza-berry-bust_52910888.png", tone: "shop-berry" },
-  { title: "Na Chalan", note: "Strawberry warmth in a can.", image: "/manus-storage/roohafza-no-chalan_ef606d6d.png", tone: "shop-red" },
-  { title: "Naam Rakh Lena", note: "Rose-coloured and easy-going.", image: "/manus-storage/roohafza-nam-rakh-lena_8d4ce84b.png", tone: "shop-cream" },
+  { title: "Berry Bust", note: "Roohafza Berry Bust 330 ml", image: "/manus-storage/roohafza-berry-bust_52910888.png", tone: "shop-berry" },
+  { title: "Straberry", note: "Roohafza Straberry 330 ml", image: "/manus-storage/roohafza-no-chalan_ef606d6d.png", tone: "shop-red" },
+  { title: "Rose", note: "Roohafza Rose 330 ml", image: "/manus-storage/roohafza-nam-rakh-lena_8d4ce84b.png", tone: "shop-cream" },
 ];
 
 function scrollToStores() {
