@@ -1,31 +1,115 @@
-import { ExternalLink, LocateFixed, Search } from "lucide-react";
-import { FormEvent, useMemo, useState } from "react";
+import { Clock3, ExternalLink, List, LocateFixed, Map as MapIcon, Navigation, Phone, Search, Store, LoaderCircle } from "lucide-react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { MapView } from "@/components/Map";
+import { createDirectionsUrl, formatRetailerHours } from "@/lib/retailerResults";
 import "./store-locator-full-map.css";
 
-const popularAreas = [
+type MapCenter = { label: string; lat: number; lng: number };
+
+type RetailerResult = {
+  id: string;
+  name: string;
+  address: string;
+  phone?: string;
+  todayHours?: string;
+  directionsUrl: string;
+};
+
+const popularAreas: MapCenter[] = [
   { label: "Delhi", lat: 28.6139, lng: 77.209 },
   { label: "Mumbai", lat: 19.076, lng: 72.8777 },
   { label: "Lucknow", lat: 26.8467, lng: 80.9462 },
   { label: "Hyderabad", lat: 17.385, lng: 78.4867 },
 ];
 
-function toMapBounds(lat: number, lng: number, spread = 0.24) {
-  const west = lng - spread;
-  const south = lat - spread;
-  const east = lng + spread;
-  const north = lat + spread;
-  return `${west},${south},${east},${north}`;
+function toRetailerResult(place: google.maps.places.PlaceResult): RetailerResult | null {
+  if (!place.name || !place.geometry?.location) return null;
+  const latitude = place.geometry.location.lat();
+  const longitude = place.geometry.location.lng();
+
+  return {
+    id: place.place_id || `${place.name}-${latitude}-${longitude}`,
+    name: place.name,
+    address: place.formatted_address || place.vicinity || "Address not published",
+    phone: place.formatted_phone_number || undefined,
+    todayHours: formatRetailerHours(place.opening_hours?.weekday_text),
+    directionsUrl: createDirectionsUrl(place.place_id, latitude, longitude),
+  };
 }
 
 export function StoreLocator() {
   const [location, setLocation] = useState("");
-  const [mapCenter, setMapCenter] = useState(popularAreas[0]);
-  const [status, setStatus] = useState("Search a city or PIN code to explore retailers nearby.");
+  const [mapCenter, setMapCenter] = useState<MapCenter>(popularAreas[0]);
+  const [status, setStatus] = useState("Search a city or PIN code to explore nearby retailers.");
+  const [retailers, setRetailers] = useState<RetailerResult[]>([]);
+  const [retailerLoading, setRetailerLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [mobileView, setMobileView] = useState<"map" | "list">("map");
+  const mapRef = useRef<google.maps.Map | null>(null);
+  const markersRef = useRef<google.maps.Marker[]>([]);
 
-  const setPopularArea = (area: (typeof popularAreas)[number]) => {
+  const clearMarkers = useCallback(() => {
+    markersRef.current.forEach((marker) => marker.setMap(null));
+    markersRef.current = [];
+  }, []);
+
+  const lookupRetailers = useCallback(async (center: MapCenter, suppliedMap?: google.maps.Map | null) => {
+    const map = suppliedMap ?? mapRef.current;
+    if (!map || !window.google?.maps?.places) return;
+
+    map.panTo({ lat: center.lat, lng: center.lng });
+    clearMarkers();
+    setRetailerLoading(true);
+    setRetailers([]);
+    setStatus(`Finding nearby retailers around ${center.label}…`);
+
+    const placeService = new window.google.maps.places.PlacesService(map);
+    placeService.nearbySearch(
+      {
+        location: new window.google.maps.LatLng(center.lat, center.lng),
+        radius: 5000,
+        type: "supermarket",
+      },
+      async (places, placesStatus) => {
+        if (placesStatus !== window.google.maps.places.PlacesServiceStatus.OK || !places?.length) {
+          setRetailerLoading(false);
+          setStatus(`No nearby retailer details were returned for ${center.label}. Try another city or open the broader retailer search.`);
+          return;
+        }
+
+        const details = await Promise.all(
+          places.slice(0, 5).map((place) => new Promise<google.maps.places.PlaceResult>((resolve) => {
+            if (!place.place_id) {
+              resolve(place);
+              return;
+            }
+            placeService.getDetails(
+              {
+                placeId: place.place_id,
+                fields: ["name", "formatted_address", "formatted_phone_number", "opening_hours", "geometry", "place_id", "vicinity"],
+              },
+              (detail, detailStatus) => resolve(detailStatus === window.google.maps.places.PlacesServiceStatus.OK && detail ? detail : place)
+            );
+          }))
+        );
+
+        const normalized = details.map(toRetailerResult).filter((retailer): retailer is RetailerResult => Boolean(retailer));
+        details.forEach((place) => {
+          if (!place.geometry?.location) return;
+          markersRef.current.push(new window.google.maps.Marker({ map, position: place.geometry.location, title: place.name }));
+        });
+        setRetailers(normalized);
+        setRetailerLoading(false);
+        setStatus(normalized.length ? `Showing ${normalized.length} nearby retailers around ${center.label}. Please call ahead to confirm Roohafza availability.` : `No nearby retailer details were returned for ${center.label}.`);
+      }
+    );
+  }, [clearMarkers]);
+
+  const setPopularArea = (area: MapCenter) => {
     setLocation(area.label);
+    setHasSearched(true);
+    setMobileView("map");
     setMapCenter(area);
-    setStatus(`Showing the map around ${area.label}. Open the retailer search to explore nearby stores.`);
   };
 
   const handleSearch = (event: FormEvent<HTMLFormElement>) => {
@@ -41,7 +125,23 @@ export function StoreLocator() {
       setPopularArea(matchedCity);
       return;
     }
-    setStatus(`We'll use ${query} for the nearby retailer search. Choose a popular city or use your location to update the map view.`);
+
+    if (!window.google?.maps) {
+      setStatus("The map is still preparing. Please try the search again in a moment.");
+      return;
+    }
+
+    setStatus(`Locating ${query}…`);
+    new window.google.maps.Geocoder().geocode({ address: query }, (results, geocodeStatus) => {
+      const result = results?.[0];
+      if (geocodeStatus !== "OK" || !result?.geometry?.location) {
+        setStatus(`We could not find ${query}. Try a city, landmark, or PIN code.`);
+        return;
+      }
+      setHasSearched(true);
+      setMobileView("map");
+      setMapCenter({ label: result.formatted_address || query, lat: result.geometry.location.lat(), lng: result.geometry.location.lng() });
+    });
   };
 
   const useMyLocation = () => {
@@ -53,20 +153,25 @@ export function StoreLocator() {
     setStatus("Requesting your location…");
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
+        setHasSearched(true);
+        setMobileView("map");
         setMapCenter({ label: "your current location", lat: coords.latitude, lng: coords.longitude });
-        setStatus("Map centred on your current location. Open the retailer search to look nearby.");
       },
       () => setStatus("We could not access your location. Search by city or PIN code instead."),
       { enableHighAccuracy: false, timeout: 8000 }
     );
   };
 
-  const mapSrc = useMemo(() => {
-    const bbox = encodeURIComponent(toMapBounds(mapCenter.lat, mapCenter.lng));
-    const marker = encodeURIComponent(`${mapCenter.lat},${mapCenter.lng}`);
-    return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${marker}`;
-  }, [mapCenter]);
-  const mapsQuery = encodeURIComponent(`Roohafza cans near ${location.trim() || mapCenter.label}`);
+  const handleMapReady = useCallback((map: google.maps.Map) => {
+    mapRef.current = map;
+    if (hasSearched) lookupRetailers(mapCenter, map);
+  }, [hasSearched, lookupRetailers, mapCenter]);
+
+  useEffect(() => {
+    if (hasSearched && mapRef.current) lookupRetailers(mapCenter);
+  }, [hasSearched, lookupRetailers, mapCenter]);
+
+  const mapsQuery = useMemo(() => encodeURIComponent(`Roohafza cans near ${location.trim() || mapCenter.label}`), [location, mapCenter.label]);
 
   return (
     <section className="locator-section section-pad" id="stores" aria-labelledby="locator-title">
@@ -75,13 +180,17 @@ export function StoreLocator() {
           <span className="section-kicker"><i />Find the feeling</span>
           <h2 id="locator-title">A can of <em>Roohafza,</em><br />close to you.</h2>
         </div>
-        <p>Search your city or use your current location to centre the map, then explore local retailers. Stock can change—please call ahead before visiting.</p>
+        <p>Search your city or use your current location to find nearby retailers. Store availability can change—please call ahead before visiting.</p>
       </div>
 
       <div className="locator-layout">
-        <div className="map-frame map-frame--full">
-          <iframe className="roohafza-map" src={mapSrc} title="Interactive map for the Roohafza store locator" loading="lazy" />
+        <div className={`map-frame map-frame--full${mobileView === "list" ? " is-list-view" : ""}`}>
+          <MapView className="roohafza-map" initialCenter={{ lat: mapCenter.lat, lng: mapCenter.lng }} initialZoom={12} onMapReady={handleMapReady} />
           <div className="map-caption"><span>Roohafza Locator</span><b>Explore {mapCenter.label}</b></div>
+          <div className="mobile-locator-toggle" role="group" aria-label="Choose store locator view">
+            <button type="button" className={mobileView === "map" ? "is-active" : ""} aria-pressed={mobileView === "map"} onClick={() => setMobileView("map")}><MapIcon size={14} />Map</button>
+            <button type="button" className={mobileView === "list" ? "is-active" : ""} aria-pressed={mobileView === "list"} onClick={() => setMobileView("list")}><List size={14} />List</button>
+          </div>
           <div className="locator-panel locator-panel--overlay">
             <span className="panel-number">01 / LOCATE</span>
             <h3>Where should we look?</h3>
@@ -98,7 +207,19 @@ export function StoreLocator() {
               <div>{popularAreas.map((area) => <button key={area.label} type="button" onClick={() => setPopularArea(area)}>{area.label}</button>)}</div>
             </div>
             <p className="locator-status" aria-live="polite">{status}</p>
-            <a className="maps-link" href={`https://www.google.com/maps/search/?api=1&query=${mapsQuery}`} target="_blank" rel="noreferrer">Open nearby retailer search <ExternalLink size={15} /></a>
+            {retailerLoading && <div className="retailer-loading" role="status"><LoaderCircle size={16} />Finding nearby retailers…</div>}
+            {!retailerLoading && retailers.length > 0 && <section className="retailer-results" aria-label={`Nearby retailers around ${mapCenter.label}`}>
+              <div className="retailer-results-heading"><span>Nearby retailers</span><b>{retailers.length}</b></div>
+              <div className="retailer-card-list">
+                {retailers.map((retailer) => <article className="retailer-card" key={retailer.id}>
+                  <div className="retailer-card-title"><Store size={15} /><h4>{retailer.name}</h4></div>
+                  <p>{retailer.address}</p>
+                  <div className="retailer-meta"><span><Clock3 size={13} />{retailer.todayHours}</span>{retailer.phone ? <a href={`tel:${retailer.phone.replace(/\s+/g, "")}`}><Phone size={13} />{retailer.phone}</a> : <span><Phone size={13} />Contact not published</span>}</div>
+                  <a className="retailer-directions" href={retailer.directionsUrl} target="_blank" rel="noreferrer"><Navigation size={14} />Directions <ExternalLink size={13} /></a>
+                </article>)}
+              </div>
+            </section>}
+            <a className="maps-link" href={`https://www.google.com/maps/search/?api=1&query=${mapsQuery}`} target="_blank" rel="noreferrer">Open broader retailer search <ExternalLink size={15} /></a>
           </div>
         </div>
       </div>
