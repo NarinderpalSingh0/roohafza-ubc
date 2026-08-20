@@ -62,6 +62,7 @@
 - [ ] Inspect Vercel Production environment-variable coverage and confirm the live Shopify and newsletter tRPC flows.
 - [ ] Restore the missing Vercel `/api/trpc` runtime route and validate the live Shopify and newsletter API surface.
 - [ ] Add the required Shopify, database, and session environment variables to Vercel Production and verify the live commerce flow.
+- [ ] Restore the Vercel Production Shopify catalogue so all three 330 ml cans show ₹99 pricing and functional Add to Cart controls instead of the placeholder cards.
 - [x] Expand the store locator into a full-width, responsive map treatment with the controls integrated over or alongside the map.
 - [ ] Fix the deployed locator map so it fills the full map canvas instead of rendering as a narrow column beside unused space.
 - [x] Add a visible, accessible cart option to the site header that opens the existing shopping-cart experience.
