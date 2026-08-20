@@ -14,14 +14,22 @@ describe("Vercel deployment configuration", () => {
     expect(config.installCommand).toBe("pnpm install --frozen-lockfile");
     expect(config.buildCommand).toBe("pnpm build");
     expect(config.outputDirectory).toBe("dist/public");
+    expect(config.rewrites).toEqual([
+      {
+        source: "/api/:path*",
+        destination: "/api?path=:path*",
+      },
+    ]);
   });
 
-  it("provides a catch-all API function for the Express+tRPC application", () => {
-    const functionPath = path.join(projectRoot, "api", "[...path].ts");
+  it("provides a rewrite-backed API function for the Express+tRPC application", () => {
+    const functionPath = path.join(projectRoot, "api", "index.ts");
     const functionSource = fs.readFileSync(functionPath, "utf8");
 
     expect(functionSource).toContain('import { createApp } from "../server/_core/app"');
-    expect(functionSource).toContain("export default createApp()");
+    expect(functionSource).toContain("export default function handler");
+    expect(functionSource).toContain('requestUrl.searchParams.get("path")');
+    expect(functionSource).toContain("return app(req, res)");
   });
 
   it("uses public CDN URLs for supplied brand assets instead of the Manus-only storage proxy", () => {

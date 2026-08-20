@@ -43,3 +43,9 @@ The user approved promotion in their Chrome Vercel session. The `c40ba48` previe
 The Production build completed successfully and assigned `roohafza-ubc.vercel.app` to deployment `5Z2XTftVSyE4EKDAm65gTCBZz3cZ`. A live Chrome-session check confirmed that the header wordmark, Rose campaign photograph, and Rose can render correctly on the public site. The broken `/manus-storage/*` image path is no longer used for the Roohafza brand assets.
 
 The captured live production DOM contains all seven expected `files.manuscdn.com` WebP URLs for the wordmark, three can renders, and three campaign photographs. A direct DOM scan found zero `/manus-storage/roohafza-*` references.
+
+## API runtime follow-up
+
+Vercel’s Production resource list shows one Node.js function at the literal path `/api/[...path]`. Two correctly formed requests to `/api/trpc/commerce.products.list` returned the Vercel `404: NOT_FOUND` page before reaching tRPC. This establishes that the bracketed filename was emitted as a literal route rather than a usable catch-all API route and must be replaced with explicit Vercel routing.
+
+Vercel’s routing guide documents `:path*` captures in `vercel.json` rewrites, and its Node.js Functions guide confirms that a TypeScript file at `api/index.ts` is a supported function entry point. The replacement will therefore route `/api/:path*` to `api/index.ts`, preserve the captured API subpath, and hand that reconstructed request to the existing Express+tRPC application. Sources: https://vercel.com/docs/routing/rewrites and https://vercel.com/docs/functions/runtimes/node-js.
