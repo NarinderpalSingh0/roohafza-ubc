@@ -74,7 +74,7 @@ Do not commit `.env` files or any credentials. Local development and the Manus-m
 
 ## Deploy to Vercel
 
-The recommended deployment source is the repository’s current default branch: **`manus/roohafza-latest`**. The deployment configuration uses `pnpm install --frozen-lockfile`, runs `pnpm build:vercel`, serves `dist/public` as the Vite client output, bundles `server/vercel-api.ts` as `api/index.js`, and rewrites `/api/:path*` requests to that Express+tRPC function.
+The recommended deployment source is the repository’s current default branch: **`manus/roohafza-latest`**. The deployment configuration uses `pnpm install --frozen-lockfile`, runs `pnpm build:vercel`, serves `dist/public` as the Vite client output, and rewrites `/api/:path*` requests to the bundled Express+tRPC function at `api/index.js`. The bundle is tracked so Vercel can discover the function before its build command executes, and is refreshed by `pnpm build:vercel`.
 
 1. Import `NarinderpalSingh0/roohafza-ubc` into Vercel.
 2. Set the Production Branch to `manus/roohafza-latest`.

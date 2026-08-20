@@ -27,10 +27,12 @@ describe("Vercel deployment configuration", () => {
       fs.readFileSync(path.join(projectRoot, "package.json"), "utf8")
     );
     const functionPath = path.join(projectRoot, "server", "vercel-api.ts");
+    const bundledEntryPath = path.join(projectRoot, "api", "index.js");
     const functionSource = fs.readFileSync(functionPath, "utf8");
 
     expect(packageJson.scripts["build:vercel"]).toContain("esbuild server/vercel-api.ts");
     expect(packageJson.scripts["build:vercel"]).toContain("--outfile=api/index.js");
+    expect(fs.existsSync(bundledEntryPath)).toBe(true);
     expect(functionSource).toContain('import { createApp } from "./_core/app"');
     expect(functionSource).toContain("export default function handler");
     expect(functionSource).toContain('requestUrl.searchParams.get("path")');
