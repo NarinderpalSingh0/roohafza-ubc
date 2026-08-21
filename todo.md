@@ -80,10 +80,10 @@
 - [x] Commit the bundled `api/index.js` function artifact so Vercel discovers the API route before executing the build command.
 - [x] Publish the verified full-artwork framing update and report the essential Vercel API status within the expedited delivery window.
 - [x] Promote commit e649920 to Vercel Production and confirm the uncropped artwork is live.
-- [ ] Configure a secure, event-triggered newsletter confirmation email after a visitor subscribes.
-- [ ] Authorize `sipandslayroohafza@gmail.com` as the newsletter sender and complete an end-to-end signup reply test.
-- [ ] Configure the approved Gmail bridge endpoint and professional Roohafza confirmation-email template.
-- [ ] Push and verify the completed Gmail newsletter confirmation integration on Vercel Production.
+- [x] Configure a secure, event-triggered newsletter confirmation email after a visitor subscribes.
+- [x] Authorize `sipandslayroohafza@gmail.com` as the newsletter sender and complete an end-to-end signup reply test.
+- [x] Configure the approved Gmail bridge endpoint and professional Roohafza confirmation-email template.
+- [x] Push and verify the completed Gmail newsletter confirmation integration on Vercel Production.
 - [x] Adjust Roohafza campaign and can-image framing so full artwork is visible without cropped edges on desktop and mobile.
 - [x] Remove unused campaign-image whitespace with a responsive full-composition layout that remains balanced on phone screens.
 - [x] Retain the user-preferred colour-filled campaign surround while preserving the full image and mobile balance.
@@ -101,4 +101,4 @@
 - [x] Use the user’s Chrome session to inspect and promote the completed Vercel image-fix deployment.
 - [x] Add a server-only Gmail bridge client with timeout, response validation, and focused unit coverage.
 - [x] Configure the Gmail bridge endpoint and private token as deployment-only environment variables.
-- [ ] Verify a live newsletter signup receives the branded Roohafza confirmation email without exposing the private token.
+- [x] Verify a live newsletter signup receives the branded Roohafza confirmation email without exposing the private token.
