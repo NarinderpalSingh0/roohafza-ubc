@@ -309,6 +309,35 @@ async function subscribeToNewsletter(input) {
   return { email: input.email };
 }
 
+// server/newsletterBridge.ts
+function isBridgeSuccess(payload) {
+  return Boolean(payload && typeof payload === "object" && "ok" in payload && payload.ok === true);
+}
+async function sendNewsletterConfirmation(email, options = {}) {
+  const bridgeUrl = options.bridgeUrl ?? process.env.GMAIL_BRIDGE_URL;
+  const bridgeSecret = options.bridgeSecret ?? process.env.GMAIL_BRIDGE_SECRET;
+  if (!bridgeUrl || !bridgeSecret) {
+    return { status: "not_configured" };
+  }
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), options.timeoutMs ?? 8e3);
+  try {
+    const response = await (options.fetchImpl ?? fetch)(bridgeUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, secret: bridgeSecret }),
+      signal: controller.signal
+    });
+    const payload = await response.json().catch(() => null);
+    return response.ok && isBridgeSuccess(payload) ? { status: "sent" } : { status: "failed" };
+  } catch (error) {
+    console.error("[Newsletter] Confirmation bridge request failed:", error);
+    return { status: "failed" };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 // server/routers/commerce.ts
 import { z as z3 } from "zod";
 
@@ -825,7 +854,12 @@ var appRouter = router({
   newsletter: router({
     subscribe: publicProcedure.input(newsletterSubscriptionInput).mutation(async ({ input }) => {
       const subscriber = await subscribeToNewsletter(input);
-      return { success: true, email: subscriber.email };
+      const confirmation = await sendNewsletterConfirmation(subscriber.email);
+      return {
+        success: true,
+        email: subscriber.email,
+        confirmationSent: confirmation.status === "sent"
+      };
     })
   })
 });

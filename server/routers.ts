@@ -3,6 +3,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { newsletterSubscriptionInput, subscribeToNewsletter } from "./newsletter";
+import { sendNewsletterConfirmation } from "./newsletterBridge";
 import { commerceRouter } from "./routers/commerce";
 
 export const appRouter = router({
@@ -19,7 +20,12 @@ export const appRouter = router({
   newsletter: router({
     subscribe: publicProcedure.input(newsletterSubscriptionInput).mutation(async ({ input }) => {
       const subscriber = await subscribeToNewsletter(input);
-      return { success: true, email: subscriber.email } as const;
+      const confirmation = await sendNewsletterConfirmation(subscriber.email);
+      return {
+        success: true,
+        email: subscriber.email,
+        confirmationSent: confirmation.status === "sent",
+      } as const;
     }),
   }),
 });
