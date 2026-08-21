@@ -91,22 +91,68 @@ const FORGE_BASE_URL =
   import.meta.env.VITE_FRONTEND_FORGE_API_URL ||
   "https://forge.butterfly-effect.dev";
 const MAPS_PROXY_URL = `${FORGE_BASE_URL}/v1/maps/proxy`;
+const MAPS_SCRIPT_ID = "roohafza-google-maps-sdk";
+const MAPS_SDK_READY_TIMEOUT_MS = 8_000;
 
-function loadMapScript() {
-  return new Promise(resolve => {
-    const script = document.createElement("script");
-    script.src = `${MAPS_PROXY_URL}/maps/api/js?key=${API_KEY}&v=weekly&libraries=marker,places,geocoding,geometry`;
-    script.async = true;
-    script.crossOrigin = "anonymous";
-    script.onload = () => {
-      resolve(null);
-      script.remove(); // Clean up immediately
+let mapsScriptPromise: Promise<void> | null = null;
+
+function hasMapsSdk() {
+  return Boolean(window.google?.maps?.Map);
+}
+
+function waitForMapsSdk(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const startedAt = Date.now();
+    const checkSdk = () => {
+      if (hasMapsSdk()) {
+        resolve();
+        return;
+      }
+
+      if (Date.now() - startedAt >= MAPS_SDK_READY_TIMEOUT_MS) {
+        reject(new Error("Google Maps SDK was not ready before the timeout"));
+        return;
+      }
+
+      window.setTimeout(checkSdk, 50);
     };
-    script.onerror = () => {
-      console.error("Failed to load Google Maps script");
-    };
-    document.head.appendChild(script);
+
+    checkSdk();
   });
+}
+
+function loadMapScript(): Promise<void> {
+  if (hasMapsSdk()) return Promise.resolve();
+  if (mapsScriptPromise) return mapsScriptPromise;
+
+  mapsScriptPromise = new Promise<void>((resolve, reject) => {
+    const existingScript = document.getElementById(MAPS_SCRIPT_ID) as HTMLScriptElement | null;
+    const script = existingScript || document.createElement("script");
+
+    const handleLoad = () => {
+      void waitForMapsSdk().then(resolve, handleError);
+    };
+
+    const handleError = (error = new Error("Failed to load Google Maps script")) => {
+      mapsScriptPromise = null;
+      reject(error);
+    };
+
+    const handleScriptError = () => handleError();
+
+    script.addEventListener("load", handleLoad, { once: true });
+    script.addEventListener("error", handleScriptError, { once: true });
+
+    if (!existingScript) {
+      script.id = MAPS_SCRIPT_ID;
+      script.src = `${MAPS_PROXY_URL}/maps/api/js?key=${API_KEY}&v=weekly&loading=async&libraries=marker,places,geocoding,geometry`;
+      script.async = true;
+      script.crossOrigin = "anonymous";
+      document.head.appendChild(script);
+    }
+  });
+
+  return mapsScriptPromise;
 }
 
 interface MapViewProps {
@@ -126,7 +172,12 @@ export function MapView({
   const map = useRef<google.maps.Map | null>(null);
 
   const init = usePersistFn(async () => {
-    await loadMapScript();
+    try {
+      await loadMapScript();
+    } catch {
+      return;
+    }
+
     if (!mapContainer.current) {
       console.error("Map container not found");
       return;

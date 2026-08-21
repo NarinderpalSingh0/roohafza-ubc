@@ -114,3 +114,9 @@
 - [x] Send final Sheet access instructions after direct row-append and duplicate checks are confirmed.
 - [x] Verify a second Production newsletter submission for the same address leaves the subscriber Sheet row count unchanged.
 - [x] Send the final Google Sheet link and concise viewing instructions after the repeat-signup check.
+- [x] Fix the homepage Google Maps JavaScript API duplicate-loading error while preserving the store locator.
+- [x] Verify the homepage map and browser console remain clean after the loader fix.
+- [x] Verify the map loader in a fresh homepage session with no new duplicate-loader console warning.
+- [x] Exercise the live locator map, search, and refresh controls while confirming the console remains clean.
+- [ ] Use the live locator after the map-loader fix to run a city search, select a popular city, and refresh the map.
+- [ ] Confirm no new Google Maps loader or runtime error occurs during the live locator interactions.
