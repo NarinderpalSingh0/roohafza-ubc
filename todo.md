@@ -102,3 +102,15 @@
 - [x] Add a server-only Gmail bridge client with timeout, response validation, and focused unit coverage.
 - [x] Configure the Gmail bridge endpoint and private token as deployment-only environment variables.
 - [x] Verify a live newsletter signup receives the branded Roohafza confirmation email without exposing the private token.
+- [x] Document where the current Roohafza newsletter subscriber list is stored and how to view it.
+- [x] Provide safe customization guidance for the confirmation-email template and sender name.
+- [x] Create a Roohafza subscriber Google Sheet and append each valid signup without duplicating existing addresses.
+- [x] Keep the database as the source of truth and verify the Google Sheet copy after a live signup.
+- [x] Verify a brand-new unique newsletter signup adds exactly one new row to the Roohafza subscriber Google Sheet.
+- [x] Verify a repeat signup for the same email does not create a duplicate Sheet row.
+- [x] Document the subscriber Sheet link and viewing steps after confirming the live row-copy behavior.
+- [x] Verify the subscriber Sheet contents through authenticated Google Sheets access after the unique Production signup.
+- [x] Verify a repeat Production signup leaves the authenticated subscriber Sheet row count unchanged.
+- [x] Send final Sheet access instructions after direct row-append and duplicate checks are confirmed.
+- [x] Verify a second Production newsletter submission for the same address leaves the subscriber Sheet row count unchanged.
+- [x] Send the final Google Sheet link and concise viewing instructions after the repeat-signup check.
